@@ -7,16 +7,24 @@ import lombok.Data;
 public class Recommendation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long recommendationId;
+    @Column(name = "matching_id")
+    private Long matchingId;
+
+    @Column(name = "type")
+    private String type;
+
+    @Column(name = "food_type")
+    private String foodType;
 
     @ManyToOne
-    @JoinColumn(name = "recipient_id", nullable = false)
+    @JoinColumn(name = "recipient_id", foreignKey = @ForeignKey(name = "FK_recommendation_recipient"))
     private Recipient recipient;
 
     @ManyToOne
-    @JoinColumn(name = "listing_id", nullable = false)
-    private Listing listing;
+    @JoinColumn(name = "donor_id", foreignKey = @ForeignKey(name = "FK_recommendation_donor"))
+    private Donor donor;
 
-    private double score;
+    @Column(name = "score")
+    private Double score;
 
 }
