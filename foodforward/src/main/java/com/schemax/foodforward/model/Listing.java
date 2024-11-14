@@ -1,10 +1,15 @@
 package com.schemax.foodforward.model;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
-import java.util.Date;
-
-@Entity
+@Entity(name = "Listing")
 @Data
 public class Listing {
     @Id
@@ -18,9 +23,6 @@ public class Listing {
 
     @Column(name = "location", length = 2048)
     private String location;
-
-    @Column(name = "expiration_date")
-    private Date expirationDate;
 
     @Column(name = "type")
     private String type;
