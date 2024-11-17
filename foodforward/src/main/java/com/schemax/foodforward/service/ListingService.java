@@ -4,9 +4,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.schemax.foodforward.model.Listing;
+import com.schemax.foodforward.dto.ListingDTO;
+import com.schemax.foodforward.dto.ListingSearchDTO;
 
 @Service
 public interface ListingService {
-    List<Listing> getTop10Listings();
+	public List<ListingDTO> searchListings(ListingSearchDTO searchDTO);
 }
