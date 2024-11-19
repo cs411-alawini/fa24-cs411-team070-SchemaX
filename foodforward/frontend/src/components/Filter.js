@@ -1,15 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const FilterComponent = ({ onApplyFilters }) => {
+const FilterComponent = ({ onApplyFilters, location }) => {
   const [filters, setFilters] = useState({
     foodType: '',
-    quantity: '',
+    quantityNeeded: '',
     expiryDate: '',
     pickupTimeStart: '',
     pickupTimeEnd: '',
-    location: '',
+    location: location || '',
     distance: ''
   });
+
+  useEffect(() => {
+    setFilters((prevState) => ({
+      ...prevState,
+      location: location || ''  // Update location if parent provides it
+    }));
+  }, [location]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -49,8 +56,8 @@ const FilterComponent = ({ onApplyFilters }) => {
           <label className="block text-gray-700 font-semibold">Quantity Needed</label>
           <input
             type="number"
-            name="quantity"
-            value={filters.quantity}
+            name="quantityNeeded"
+            value={filters.quantityNeeded}
             onChange={handleChange}
             placeholder="Enter quantity"
             className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -108,13 +115,13 @@ const FilterComponent = ({ onApplyFilters }) => {
 
         {/* Distance */}
         <div>
-          <label className="block text-gray-700 font-semibold">Distance (in km)</label>
+          <label className="block text-gray-700 font-semibold">Distance (in m)</label>
           <input
             type="number"
             name="distance"
             value={filters.distance}
             onChange={handleChange}
-            placeholder="Enter distance in km"
+            placeholder="Enter distance in meters"
             className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
