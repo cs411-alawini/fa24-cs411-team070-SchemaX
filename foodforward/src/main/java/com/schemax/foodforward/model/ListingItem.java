@@ -17,15 +17,15 @@ public class ListingItem {
     private Long quantity;
 
     @ManyToOne
-    @JoinColumn(name = "item_id", foreignKey = @ForeignKey(name = "FK_listingitem_item"))
+    @JoinColumn(name = "item_id")
     private Item item;
 
     @ManyToOne
-    @JoinColumn(name = "listing_id", foreignKey = @ForeignKey(name = "FK_listingitem_listing"))
+    @JoinColumn(name = "listing_id")
     private Listing listing;
 
     @ManyToOne
-    @JoinColumn(name = "booking_id", foreignKey = @ForeignKey(name = "FK_listingitem_booking"))
+    @JoinColumn(name = "booking_id")
     private Booking booking;
 
     @Column(name = "expiration_date")
