@@ -91,4 +91,10 @@ public class ListingServiceImpl implements ListingService {
         listingRepository.save(listing);
         return new ResponseEntity<>("Created listing with id : " + listing.getListingId(), HttpStatus.CREATED);
     }
+
+    @Override
+    public ResponseEntity<Listing> getListingDetails(Long listingId) {
+        Listing listing = listingRepository.findById(listingId).orElseThrow(() -> new RuntimeException("Listing not found"));
+        return new ResponseEntity<>(listing, HttpStatus.OK);
+    }
 }

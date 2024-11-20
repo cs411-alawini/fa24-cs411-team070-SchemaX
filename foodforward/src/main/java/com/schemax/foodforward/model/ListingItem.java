@@ -1,5 +1,6 @@
 package com.schemax.foodforward.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -20,8 +21,9 @@ public class ListingItem {
     @JoinColumn(name = "item_id")
     private Item item;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "listing_id")
+    @JsonIgnore // Temporary Solution
     private Listing listing;
 
     @ManyToOne

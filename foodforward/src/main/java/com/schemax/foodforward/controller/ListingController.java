@@ -6,10 +6,7 @@ import com.schemax.foodforward.dto.CreateListingDTO;
 import com.schemax.foodforward.model.Listing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.schemax.foodforward.dto.ListingDTO;
 import com.schemax.foodforward.dto.ListingSearchDTO;
@@ -30,5 +27,10 @@ public class ListingController {
 	@PostMapping("/add")
 	public ResponseEntity<String> addListing(@RequestBody CreateListingDTO listing) {
 		return listingService.addListing(listing);
+	}
+
+	@GetMapping("/getListing")
+	public ResponseEntity<Listing> getListingDetails(@RequestParam Long listingId) {
+		return listingService.getListingDetails(listingId);
 	}
 }
