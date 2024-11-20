@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import Filter from './Filter';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 
 const Card = ({ listing }) => {
   return (
-    <div className="bg-gray-100 p-6 rounded-lg shadow-md transform transition duration-300 ease-in-out hover:-translate-y-2 hover:shadow-lg hover:bg-blue-100">
-      <h3 className="text-lg font-bold text-gray-800 mb-4">Donor: {listing.donorName}</h3>
-      <div className="grid grid-cols-2 gap-y-2 gap-x-6 text-gray-600">
-        <p className="text-md"><span className="font-semibold text-gray-800">Listing ID:</span> {listing.listingId}</p>
-        <p className="text-md"><span className="font-semibold text-gray-800">Item ID:</span> {listing.itemId}</p>
-        <p className="text-md"><span className="font-semibold text-gray-800">Item Name:</span> {listing.itemName}</p>
-        <p className="text-md"><span className="font-semibold text-gray-800">Category:</span> {listing.category}</p>
-        <p className="text-md"><span className="font-semibold text-gray-800">Quantity:</span> {listing.quantity}</p>
-        <p className="text-md"><span className="font-semibold text-gray-800">Expiration Date:</span> {listing.expirationDate}</p>
-        <p className="text-md"><span className="font-semibold text-gray-800">Donor ID:</span> {listing.donorId}</p>
-      </div>
-    </div>
+      <Link to={`/listing/${listing.listingId}`}>
+        <div className="bg-gray-100 p-6 rounded-lg shadow-md transform transition duration-300 ease-in-out hover:-translate-y-2 hover:shadow-lg hover:bg-blue-100">
+          <h3 className="text-lg font-bold text-gray-800 mb-4">Donor: {listing.donorName}</h3>
+          <div className="grid grid-cols-2 gap-y-2 gap-x-6 text-gray-600">
+            <p className="text-md"><span className="font-semibold text-gray-800">Listing ID:</span> {listing.listingId}</p>
+            <p className="text-md"><span className="font-semibold text-gray-800">Item ID:</span> {listing.itemId}</p>
+            <p className="text-md"><span className="font-semibold text-gray-800">Item Name:</span> {listing.itemName}</p>
+            <p className="text-md"><span className="font-semibold text-gray-800">Category:</span> {listing.category}</p>
+            <p className="text-md"><span className="font-semibold text-gray-800">Quantity:</span> {listing.quantity}</p>
+            <p className="text-md"><span className="font-semibold text-gray-800">Expiration Date:</span> {listing.expirationDate}</p>
+            <p className="text-md"><span className="font-semibold text-gray-800">Donor ID:</span> {listing.donorId}</p>
+          </div>
+        </div>
+      </Link>
   );
 };
 
