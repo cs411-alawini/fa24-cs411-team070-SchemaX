@@ -101,7 +101,7 @@ const FilterComponent = ({ onApplyFilters, location }) => {
         </div>
 
         {/* Location */}
-        <div>
+        {/* <div>
           <label className="block text-gray-700 font-semibold">Location</label>
           <input
             type="text"
@@ -111,7 +111,7 @@ const FilterComponent = ({ onApplyFilters, location }) => {
             placeholder="Enter location"
             className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
-        </div>
+        </div> */}
 
         {/* Distance */}
         <div>
