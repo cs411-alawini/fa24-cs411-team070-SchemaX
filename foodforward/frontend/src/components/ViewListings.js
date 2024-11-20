@@ -52,11 +52,14 @@ function ViewListings() {
         expiryDate: filters.expiryDate?.trim() || null,
         pickupTimeStart: filters.pickupTimeStart?.trim() || null,
         pickupTimeEnd: filters.pickupTimeEnd?.trim() || null,
-        location: filters.location?.trim() || null,
+        //location: filters.location?.trim() || null,
         distance: filters.distance ? parseInt(filters.distance, 10) : null,
-        latitude: userInfo.latitude || null,
-        longitude: userInfo.longitude || null
       };
+
+      if(requestPayload.distance !== null){
+        requestPayload.latitude  =  userInfo.latitude || null;
+        requestPayload.longitude =  userInfo.longitude || null;
+      }
   
       // console.log('payload:',requestPayload);
       const response = await axios.post(postApiUrl, requestPayload);
