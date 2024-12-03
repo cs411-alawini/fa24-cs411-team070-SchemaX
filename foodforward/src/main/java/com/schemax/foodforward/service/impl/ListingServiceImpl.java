@@ -34,6 +34,7 @@ public class ListingServiceImpl implements ListingService {
 
     @Override
     public List<ListingDTO> searchListings(ListingSearchDTO searchDTO) {
+    	System.out.println(searchDTO);
         List<Object[]> results = listingRepository.findListingsWithFilters(
                 searchDTO.getFoodType(),
                 searchDTO.getQuantityNeeded(),
@@ -90,5 +91,11 @@ public class ListingServiceImpl implements ListingService {
         listing.setListingItems(listingItems);
         listingRepository.save(listing);
         return new ResponseEntity<>("Created listing with id : " + listing.getListingId(), HttpStatus.CREATED);
+    }
+
+    @Override
+    public ResponseEntity<Listing> getListingDetails(Long listingId) {
+        Listing listing = listingRepository.findById(listingId).orElseThrow(() -> new RuntimeException("Listing not found"));
+        return new ResponseEntity<>(listing, HttpStatus.OK);
     }
 }

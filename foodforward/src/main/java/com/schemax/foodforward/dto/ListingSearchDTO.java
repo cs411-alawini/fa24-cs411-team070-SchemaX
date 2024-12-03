@@ -88,4 +88,14 @@ public class ListingSearchDTO {
 		this.userLongitude = userLongitude;
 	}
 
+	@Override
+	public String toString() {
+		return "ListingSearchDTO [foodType=" + foodType + ", quantityNeeded=" + quantityNeeded + ", expiryDate="
+				+ expiryDate + ", pickupTimeStart=" + pickupTimeStart + ", pickupTimeEnd=" + pickupTimeEnd
+				+ ", location=" + location + ", distance=" + distance + ", userLatitude=" + userLatitude
+				+ ", userLongitude=" + userLongitude + "]";
+	}
+	
+	
+
 }

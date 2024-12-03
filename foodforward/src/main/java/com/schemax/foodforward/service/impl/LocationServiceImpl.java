@@ -23,7 +23,7 @@ public class LocationServiceImpl implements LocationService {
 	@Autowired
 	private UserRepository userRepository;
 
-	private final String apiKey = "AIzaSyC5v1erJPoEpLYQVgwuzoeBOOi5ZCH6c_Q";
+	private final String apiKey = System.getenv("google.maps.api");
 
 	public void updateListingsWithCoordinates() {
 		List<Listing> listingsWithoutCoordinates = listingRepository.findAllByLatitudeIsNullAndLongitudeIsNull();
