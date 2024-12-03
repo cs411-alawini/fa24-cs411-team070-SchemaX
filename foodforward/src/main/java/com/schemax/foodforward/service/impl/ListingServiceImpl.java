@@ -34,6 +34,7 @@ public class ListingServiceImpl implements ListingService {
 
     @Override
     public List<ListingDTO> searchListings(ListingSearchDTO searchDTO) {
+    	System.out.println(searchDTO);
         List<Object[]> results = listingRepository.findListingsWithFilters(
                 searchDTO.getFoodType(),
                 searchDTO.getQuantityNeeded(),
