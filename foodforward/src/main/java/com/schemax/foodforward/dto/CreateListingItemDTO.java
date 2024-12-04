@@ -9,6 +9,7 @@ public class CreateListingItemDTO {
 	private Long itemId;
 	private Date expirationDate;
 	private Long quantity;
+	private String status;
 
 	public Long getItemId() {
 		return itemId;

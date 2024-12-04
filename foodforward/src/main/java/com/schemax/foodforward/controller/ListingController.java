@@ -3,6 +3,7 @@ package com.schemax.foodforward.controller;
 import java.util.List;
 
 import com.schemax.foodforward.dto.CreateListingDTO;
+import com.schemax.foodforward.dto.UpdateListingDTO;
 import com.schemax.foodforward.model.Listing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,19 @@ public class ListingController {
 	}
 
 	@GetMapping("/getListing")
-	public ResponseEntity<Listing> getListingDetails(@RequestParam Long listingId) {
+	public ResponseEntity<Listing> getListingDetails(@RequestParam(required = false) Long listingId) {
 		return listingService.getListingDetails(listingId);
 	}
+
+	@GetMapping("/getAllListings")
+	public ResponseEntity<List<Listing>> getAllListings(@RequestParam(required = false) Long donorId) {
+		return listingService.getAllListings(donorId);
+	}
+
+	@PostMapping("/updateListing")
+	public ResponseEntity<String> updateListing(@RequestBody UpdateListingDTO updateListingDTO) {
+		return listingService.updateListing(updateListingDTO);
+	}
+
+	//TODO: update Listing Item
 }

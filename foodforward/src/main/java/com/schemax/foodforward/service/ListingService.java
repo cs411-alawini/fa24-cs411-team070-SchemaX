@@ -3,6 +3,7 @@ package com.schemax.foodforward.service;
 import java.util.List;
 
 import com.schemax.foodforward.dto.CreateListingDTO;
+import com.schemax.foodforward.dto.UpdateListingDTO;
 import com.schemax.foodforward.model.Listing;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,9 @@ import com.schemax.foodforward.dto.ListingSearchDTO;
 
 @Service
 public interface ListingService {
-	public List<ListingDTO> searchListings(ListingSearchDTO searchDTO);
-	public ResponseEntity<String> addListing(CreateListingDTO listing);
-	public ResponseEntity<Listing> getListingDetails(Long listingId);
+	 List<ListingDTO> searchListings(ListingSearchDTO searchDTO);
+	 ResponseEntity<String> addListing(CreateListingDTO listing);
+	ResponseEntity<Listing> getListingDetails(Long listingId);
+	ResponseEntity<List<Listing>> getAllListings(Long donorId);
+	 ResponseEntity<String> updateListing(UpdateListingDTO updateListingDTO);
 }

@@ -1,7 +1,9 @@
 package com.schemax.foodforward.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.schemax.foodforward.dto.UpdateListingDTO;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,6 @@ public class LocationServiceImpl implements LocationService {
 
 	public void updateListingsWithCoordinates() {
 		List<Listing> listingsWithoutCoordinates = listingRepository.findAllByLatitudeIsNullAndLongitudeIsNull();
-
 		RestTemplate restTemplate = new RestTemplate();
 
 		for (Listing listing : listingsWithoutCoordinates) {
@@ -47,10 +48,12 @@ public class LocationServiceImpl implements LocationService {
 					double latitude = locationData.getDouble("lat");
 					double longitude = locationData.getDouble("lng");
 
-					listing.setLatitude(latitude);
-					listing.setLongitude(longitude);
-					listingRepository.save(listing);
+					UpdateListingDTO updateListingDTO = new UpdateListingDTO();
+					updateListingDTO.setLatitude(latitude);
+					updateListingDTO.setLongitude(longitude);
+					updateListingDTO.setListingId(listing.getListingId());
 
+					listingRepository.updateListing(updateListingDTO);
 				} else {
 					System.out.println("Failed to get coordinates for address: " + listing.getLocation());
 				}
@@ -82,10 +85,7 @@ public class LocationServiceImpl implements LocationService {
 
 					double latitude = locationData.getDouble("lat");
 					double longitude = locationData.getDouble("lng");
-
-					user.setLatitude(latitude);
-					user.setLongitude(longitude);
-					userRepository.save(user);
+					userRepository.updateUserLatitudeLongitude(latitude, longitude, user.getUserId());
 
 				} else {
 					System.out.println("Failed to get coordinates for address: " + user.getLocation());
