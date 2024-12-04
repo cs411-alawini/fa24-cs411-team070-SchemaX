@@ -35,7 +35,6 @@ const FilterComponent = ({ onApplyFilters, location }) => {
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 shadow-lg rounded-lg max-w-md mx-auto">
       <div className="space-y-3">
-        {/* Food Type Dropdown */}
         <div>
           <label className="block text-gray-700 font-semibold">Food Type</label>
           <select
@@ -45,13 +44,20 @@ const FilterComponent = ({ onApplyFilters, location }) => {
             className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
             <option value="">Select Food Type</option>
-            <option value="fruit">Fruit</option>
-            <option value="vegetable">Vegetable</option>
+            <option value="baby food">Baby Food</option>
+            <option value="beverages">Beverages</option>
+            <option value="snacks">Snacks</option>
+            <option value="canned_goods">Canned Goods</option>
+            <option value="pantry">Pantry</option>
+            <option value="frozen">Frozen</option>
+            <option value="meat">Meat</option>
+            <option value="grains">Grains</option>
             <option value="dairy">Dairy</option>
+            <option value="bakery">Bakery</option>
+            <option value="produce">Produce</option>
           </select>
         </div>
 
-        {/* Quantity Needed */}
         <div>
           <label className="block text-gray-700 font-semibold">Quantity Needed</label>
           <input
@@ -115,13 +121,13 @@ const FilterComponent = ({ onApplyFilters, location }) => {
 
         {/* Distance */}
         <div>
-          <label className="block text-gray-700 font-semibold">Distance (in m)</label>
+          <label className="block text-gray-700 font-semibold">Distance (in km)</label>
           <input
             type="number"
             name="distance"
             value={filters.distance}
             onChange={handleChange}
-            placeholder="Enter distance in meters"
+            placeholder="Enter distance in kilometers"
             className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
