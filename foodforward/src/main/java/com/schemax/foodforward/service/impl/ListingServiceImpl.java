@@ -5,11 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 import com.schemax.foodforward.dto.CreateListingDTO;
-import com.schemax.foodforward.dto.CreateListingItemDTO;
-import com.schemax.foodforward.model.Donor;
-import com.schemax.foodforward.model.Item;
+import com.schemax.foodforward.dto.UpdateListingDTO;
 import com.schemax.foodforward.model.Listing;
-import com.schemax.foodforward.model.ListingItem;
 import com.schemax.foodforward.repository.DonorRepository;
 import com.schemax.foodforward.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +31,7 @@ public class ListingServiceImpl implements ListingService {
 
     @Override
     public List<ListingDTO> searchListings(ListingSearchDTO searchDTO) {
-        List<Object[]> results = listingRepository.findListingsWithFilters(
+        List<ListingDTO> listings = listingRepository.findListingsWithFilters(
                 searchDTO.getFoodType(),
                 searchDTO.getQuantityNeeded(),
                 searchDTO.getExpiryDate(),
@@ -44,57 +41,48 @@ public class ListingServiceImpl implements ListingService {
                 searchDTO.getDistance(),
                 searchDTO.getUserLongitude(),
                 searchDTO.getUserLatitude());
-
-        List<ListingDTO> listings = new ArrayList<>();
-
-        for (Object[] row : results) {
-            ListingDTO dto = new ListingDTO();
-            dto.setListingId((Long) row[0]);
-            dto.setLocation((String) row[1]);
-            dto.setItemId((Long) row[2]);
-            dto.setItemName((String) row[3]);
-            dto.setCategory((String) row[4]);
-            dto.setQuantity((Long) row[5]);
-            dto.setExpirationDate((Date) row[6]);
-            dto.setDonorId((Long) row[7]);
-            dto.setDonorName((String) row[8]);
-
-            listings.add(dto);
-        }
-
         return listings;
     }
 
     @Override
-    public ResponseEntity<String> addListing(CreateListingDTO createListingDTO) {
-        Listing listing = new Listing();
-        List<ListingItem> listingItems = new ArrayList<>();
-        Donor donor = donorRepository.findById(createListingDTO.getDonorId()).orElseThrow(() -> new RuntimeException("Donor not found"));
-
-        for(CreateListingItemDTO listingItemDTO : createListingDTO.getListingItems()) {
-            Item item = itemRepository.findById(listingItemDTO.getItemId()).orElseThrow(() -> new RuntimeException("Item not found"));
-            ListingItem listingItem = new ListingItem();
-            listingItem.setQuantity(listingItemDTO.getQuantity());
-            listingItem.setExpirationDate(listingItemDTO.getExpirationDate());
-            listingItem.setItem(item);
-            listingItem.setStatus("AVAILABLE");
-            listingItem.setListing(listing);
-            listingItems.add(listingItem);
+    public ResponseEntity<String> addListing(CreateListingDTO listing) {
+        try {
+            Long listingId = listingRepository.saveListing(listing);
+            return ResponseEntity.ok("Listing created successfully with ID: " + listingId);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error creating listing: " + e.getMessage());
         }
-        listing.setDonor(donor);
-        listing.setLatitude(createListingDTO.getLatitude());
-        listing.setLongitude(createListingDTO.getLongitude());
-        listing.setPickupTimeRange(createListingDTO.getPickupTimeRange());
-        listing.setType(createListingDTO.getType());
-        listing.setStatus("AVAILABLE");
-        listing.setListingItems(listingItems);
-        listingRepository.save(listing);
-        return new ResponseEntity<>("Created listing with id : " + listing.getListingId(), HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<Listing> getListingDetails(Long listingId) {
-        Listing listing = listingRepository.findById(listingId).orElseThrow(() -> new RuntimeException("Listing not found"));
-        return new ResponseEntity<>(listing, HttpStatus.OK);
+        Listing listing = listingRepository.findListingByListingId(listingId);
+        if (listing != null) {
+            return ResponseEntity.ok(listing);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Override
+    public ResponseEntity<List<Listing>> getAllListings(Long donorId) {
+        List<Listing> listings = listingRepository.findAllListingsByDonor(donorId);
+        if (listings != null) {
+            return ResponseEntity.ok(listings);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> updateListing(UpdateListingDTO updateListingDTO) {
+        try {
+            int listingId = listingRepository.updateListing(updateListingDTO);
+            return ResponseEntity.ok("Listing updated successfully with ID: " + listingId);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error updating listing: " + e.getMessage());
+        }
     }
 }

@@ -1,12 +1,13 @@
 package com.schemax.foodforward.dto;
 
-import com.schemax.foodforward.model.ListingItem;
-import jakarta.persistence.Column;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class CreateListingDTO {
 	private Long donorId;
@@ -15,7 +16,7 @@ public class CreateListingDTO {
 	private Double longitude;
 	private String type;
 	private String pickupTimeRange;
-	private Date expirationDate;
+	private String status;
 	private List<CreateListingItemDTO> listingItems;
 
 	public Long getDonorId() {
@@ -64,14 +65,6 @@ public class CreateListingDTO {
 
 	public void setPickupTimeRange(String pickupTimeRange) {
 		this.pickupTimeRange = pickupTimeRange;
-	}
-
-	public Date getExpirationDate() {
-		return expirationDate;
-	}
-
-	public void setExpirationDate(Date expirationDate) {
-		this.expirationDate = expirationDate;
 	}
 
 	public List<CreateListingItemDTO> getListingItems() {

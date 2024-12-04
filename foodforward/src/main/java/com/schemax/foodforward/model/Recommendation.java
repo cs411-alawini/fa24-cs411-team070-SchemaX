@@ -2,7 +2,7 @@ package com.schemax.foodforward.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-@Entity
+//@Entity
 @Data
 public class Recommendation {
     @Id
