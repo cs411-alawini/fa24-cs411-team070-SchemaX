@@ -1,14 +1,17 @@
 package com.schemax.foodforward.controller;
 
-import java.util.Optional;
-
-import com.schemax.foodforward.model.Donor;
-import com.schemax.foodforward.model.Listing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.schemax.foodforward.model.Donor;
 import com.schemax.foodforward.model.User;
 import com.schemax.foodforward.service.UserService;
 
@@ -28,5 +31,15 @@ public class UserController {
 	@GetMapping("/donor")
 	public ResponseEntity<Donor> getDonorDetails(@RequestParam Long donorId) {
 		return userService.getDonorById(donorId);
+	}
+
+	@PostMapping("/login")
+	public ResponseEntity<User> loginUser(@RequestBody User user) {
+		User loggedInUser = userService.authenticate(user.getEmail(), user.getPassword());
+		if (loggedInUser != null) {
+			return ResponseEntity.ok(loggedInUser);
+		} else {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+		}
 	}
 }

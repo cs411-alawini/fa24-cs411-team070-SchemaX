@@ -1,6 +1,5 @@
 package com.schemax.foodforward.model;
 
-import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
@@ -36,6 +35,14 @@ public class Donor extends User {
 
 	public void setPreferredPickupTime(String preferredPickupTime) {
 		this.preferredPickupTime = preferredPickupTime;
+	}
+
+	public Double getRating() {
+		return rating;
+	}
+
+	public void setRating(Double rating) {
+		this.rating = rating;
 	}
 
 }

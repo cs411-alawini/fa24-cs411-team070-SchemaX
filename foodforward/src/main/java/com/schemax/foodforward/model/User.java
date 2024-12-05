@@ -6,22 +6,15 @@ import lombok.Data;
 public class User {
 
 	private Long userId;
-
 	private String name;
-
 	private String location;
-
 	private Double latitude;
-
 	private Double longitude;
-
 	private String contactPreference;
-
 	private String email;
-
 	private String phone;
-
 	private String type;
+	private String password;
 
 	public Long getUserId() {
 		return userId;
@@ -93,6 +86,31 @@ public class User {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+	
+	public String getPassword() {
+		return password;
+	}
+	
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public User(Long userId, String name, String location, Double latitude, Double longitude, String contactPreference,
+			String email, String phone, String type) {
+		super();
+		this.userId = userId;
+		this.name = name;
+		this.location = location;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.contactPreference = contactPreference;
+		this.email = email;
+		this.phone = phone;
+		this.type = type;
+	}
+
+	public User() {
 	}
 
 }

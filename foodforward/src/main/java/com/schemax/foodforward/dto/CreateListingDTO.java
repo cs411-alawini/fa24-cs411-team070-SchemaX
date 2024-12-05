@@ -1,11 +1,10 @@
 package com.schemax.foodforward.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
-
-import java.util.Date;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import lombok.Data;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
@@ -73,6 +72,14 @@ public class CreateListingDTO {
 
 	public void setListingItems(List<CreateListingItemDTO> listingItems) {
 		this.listingItems = listingItems;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 }

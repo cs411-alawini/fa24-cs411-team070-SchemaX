@@ -54,7 +54,7 @@ const ListingDetails = () => {
 
                 {/* Donor and Pickup Information */}
                 <div className="mb-6">
-                    <p className="text-lg"><strong>Donor:</strong> {listing.donor.user.name}</p>
+                    <p className="text-lg"><strong>Donor:</strong> {listing.donor.name}</p>
                     <p className="text-lg"><strong>Location:</strong> {listing.location}</p>
                     <p className="text-lg"><strong>Pickup Time:</strong> Between {listing.pickupTimeRange}</p>
                 </div>

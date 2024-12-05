@@ -1,21 +1,19 @@
 package com.schemax.foodforward.service.impl;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import com.schemax.foodforward.dto.CreateListingDTO;
-import com.schemax.foodforward.dto.UpdateListingDTO;
-import com.schemax.foodforward.model.Listing;
-import com.schemax.foodforward.repository.DonorRepository;
-import com.schemax.foodforward.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.schemax.foodforward.dto.CreateListingDTO;
 import com.schemax.foodforward.dto.ListingDTO;
 import com.schemax.foodforward.dto.ListingSearchDTO;
+import com.schemax.foodforward.dto.UpdateListingDTO;
+import com.schemax.foodforward.model.Listing;
+import com.schemax.foodforward.repository.DonorRepository;
+import com.schemax.foodforward.repository.ItemRepository;
 import com.schemax.foodforward.repository.ListingRepository;
 import com.schemax.foodforward.service.ListingService;
 
@@ -24,8 +22,10 @@ public class ListingServiceImpl implements ListingService {
 
     @Autowired
     private ListingRepository listingRepository;
+    
     @Autowired
     private DonorRepository donorRepository;
+    
     @Autowired
     private ItemRepository itemRepository;
 

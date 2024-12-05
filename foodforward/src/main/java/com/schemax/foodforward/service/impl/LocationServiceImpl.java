@@ -1,14 +1,13 @@
 package com.schemax.foodforward.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import com.schemax.foodforward.dto.UpdateListingDTO;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.schemax.foodforward.dto.UpdateListingDTO;
 import com.schemax.foodforward.model.Listing;
 import com.schemax.foodforward.model.User;
 import com.schemax.foodforward.repository.ListingRepository;
