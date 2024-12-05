@@ -21,8 +21,10 @@ function Login() {
             const data = await response.json();
 
             if (data.type === 'Recipient') {
+                localStorage.setItem('recipientId', data.userId);
                 navigate('/recipient_dashboard');
             } else if (data.type === 'Donor') {
+                localStorage.setItem('donorId', data.userId);
                 navigate('/donor_dashboard');
             } else {
                 alert('Invalid user type');
