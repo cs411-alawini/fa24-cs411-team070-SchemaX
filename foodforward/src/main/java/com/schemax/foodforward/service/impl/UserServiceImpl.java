@@ -1,15 +1,12 @@
 package com.schemax.foodforward.service.impl;
 
-import java.util.Optional;
-
-import com.schemax.foodforward.model.Donor;
-import com.schemax.foodforward.model.Listing;
-import com.schemax.foodforward.repository.DonorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.schemax.foodforward.model.Donor;
 import com.schemax.foodforward.model.User;
+import com.schemax.foodforward.repository.DonorRepository;
 import com.schemax.foodforward.repository.UserRepository;
 import com.schemax.foodforward.service.UserService;
 
@@ -34,6 +31,11 @@ public class UserServiceImpl implements UserService {
 		} else {
 			return ResponseEntity.notFound().build();
 		}
+	}
+
+	@Override
+	public User authenticate(String email, String password) {
+		return userRepository.findByEmailAndPassword(email, password);
 	}
 
 }

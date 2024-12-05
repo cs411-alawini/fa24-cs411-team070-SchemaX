@@ -1,8 +1,8 @@
 package com.schemax.foodforward.model;
 
-import lombok.ToString;
-
 import java.util.List;
+
+import lombok.ToString;
 
 @ToString
 public class Listing {

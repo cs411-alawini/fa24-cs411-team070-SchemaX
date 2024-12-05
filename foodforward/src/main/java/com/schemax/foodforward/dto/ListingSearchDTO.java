@@ -95,7 +95,5 @@ public class ListingSearchDTO {
 				+ ", location=" + location + ", distance=" + distance + ", userLatitude=" + userLatitude
 				+ ", userLongitude=" + userLongitude + "]";
 	}
-	
-	
 
 }

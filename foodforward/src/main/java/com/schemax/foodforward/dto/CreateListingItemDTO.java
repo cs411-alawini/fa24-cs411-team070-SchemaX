@@ -1,8 +1,8 @@
 package com.schemax.foodforward.dto;
 
-import lombok.Data;
-
 import java.util.Date;
+
+import lombok.Data;
 
 @Data
 public class CreateListingItemDTO {
@@ -33,6 +33,14 @@ public class CreateListingItemDTO {
 
 	public void setQuantity(Long quantity) {
 		this.quantity = quantity;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 }

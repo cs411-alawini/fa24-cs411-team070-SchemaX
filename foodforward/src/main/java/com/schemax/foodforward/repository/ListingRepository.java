@@ -4,19 +4,29 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-import com.schemax.foodforward.dto.CreateListingDTO;
-import com.schemax.foodforward.dto.CreateListingItemDTO;
-import com.schemax.foodforward.dto.ListingDTO;
-import com.schemax.foodforward.dto.UpdateListingDTO;
-import com.schemax.foodforward.model.*;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+
+import com.schemax.foodforward.dto.CreateListingDTO;
+import com.schemax.foodforward.dto.CreateListingItemDTO;
+import com.schemax.foodforward.dto.ListingDTO;
+import com.schemax.foodforward.dto.UpdateListingDTO;
+import com.schemax.foodforward.model.Donor;
+import com.schemax.foodforward.model.Item;
+import com.schemax.foodforward.model.Listing;
+import com.schemax.foodforward.model.ListingItem;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Repository
@@ -36,70 +46,65 @@ public class ListingRepository {
 		});
 	}
 
-	public List<ListingDTO> findListingsWithFilters(String foodType, Long quantityNeeded, Date expiryDate, String pickupTimeStart, String pickupTimeEnd, String location,
-			Double distance, Double userLongitude, Double userLatitude) {
+	@SuppressWarnings("deprecation")
+	public List<ListingDTO> findListingsWithFilters(String foodType, Long quantityNeeded, Date expiryDate,
+			String pickupTimeStart, String pickupTimeEnd, String location, Double distance, Double userLongitude,
+			Double userLatitude) {
 
 		String sql = """
-           SELECT
-                l.listing_id AS listingId,
-                l.location AS location,
-                li.item_id AS itemId,
-                i.item_name AS itemName,
-                i.category AS category,
-                li.quantity AS quantity,
-                li.expiration_date AS expirationDate,
-                d.donor_id AS donorId,
-                u.name AS donorName
-            FROM Listing l
-            JOIN ListingItem li ON l.listing_id = li.listing_id
-            JOIN Item i ON li.item_id = i.item_id
-            JOIN Donor d ON l.listed_by = d.donor_id
-            JOIN User u ON d.user_id = u.user_id
-            WHERE
-                (? IS NULL OR i.category = ?)
-                AND (? IS NULL OR li.quantity >= ?)
-                AND (? IS NULL OR li.expiration_date <= ?)
-                AND (? IS NULL OR l.pickup_time_range >= ?)
-                AND (? IS NULL OR l.pickup_time_range <= ?)
-                AND (? IS NULL OR l.location LIKE CONCAT('%', ?, '%'))
-                AND (? IS NULL OR (
-                    ? IS NOT NULL AND
-                    ? IS NOT NULL AND
-                    ST_Distance_Sphere(POINT(l.longitude, l.latitude), POINT(?, ?)) <= ?))
-                AND l.status = 'ACTIVE'
-                AND li.status = 'AVAILABLE'
-                AND (li.expiration_date IS NULL OR li.expiration_date > CURRENT_DATE)
-        """;
+				   SELECT
+				        l.listing_id AS listingId,
+				        l.location AS location,
+				        li.item_id AS itemId,
+				        i.item_name AS itemName,
+				        i.category AS category,
+				        li.quantity AS quantity,
+				        li.expiration_date AS expirationDate,
+				        d.donor_id AS donorId,
+				        u.name AS donorName
+				    FROM Listing l
+				    JOIN ListingItem li ON l.listing_id = li.listing_id
+				    JOIN Item i ON li.item_id = i.item_id
+				    JOIN Donor d ON l.listed_by = d.donor_id
+				    JOIN User u ON d.user_id = u.user_id
+				    WHERE
+				        (? IS NULL OR i.category = ?)
+				        AND (? IS NULL OR li.quantity >= ?)
+				        AND (? IS NULL OR li.expiration_date <= ?)
+				        AND (? IS NULL OR l.pickup_time_range >= ?)
+				        AND (? IS NULL OR l.pickup_time_range <= ?)
+				        AND (? IS NULL OR l.location LIKE CONCAT('%', ?, '%'))
+				        AND (? IS NULL OR (
+				            ? IS NOT NULL AND
+				            ? IS NOT NULL AND
+				            ST_Distance_Sphere(POINT(l.longitude, l.latitude), POINT(?, ?)) <= ?))
+				        AND l.status = 'ACTIVE'
+				        AND li.status = 'AVAILABLE'
+				        AND (li.expiration_date IS NULL OR li.expiration_date > CURRENT_DATE)
+				""";
 
 		return jdbcTemplate.query(sql,
-				new Object[]{
-						foodType, foodType,
-						quantityNeeded, quantityNeeded,
-						expiryDate, expiryDate,
-						pickupTimeStart, pickupTimeStart,
-						pickupTimeEnd, pickupTimeEnd,
-						location, location,
-						distance, userLatitude, userLongitude, userLongitude, userLatitude, distance
-				},
+				new Object[] { foodType, foodType, quantityNeeded, quantityNeeded, expiryDate, expiryDate,
+						pickupTimeStart, pickupTimeStart, pickupTimeEnd, pickupTimeEnd, location, location, distance,
+						userLatitude, userLongitude, userLongitude, userLatitude, distance },
 				(rs, rowNum) -> {
-			ListingDTO dto = new ListingDTO();
-			dto.setListingId(rs.getLong("listingId"));
-			dto.setLocation(rs.getString("location"));
-			dto.setItemId(rs.getLong("itemId"));
-			dto.setItemName(rs.getString("itemName"));
-			dto.setCategory(rs.getString("category"));
-			dto.setQuantity(rs.getLong("quantity"));
-			dto.setExpirationDate(rs.getDate("expirationDate"));
-			dto.setDonorId(rs.getLong("donorId"));
-			dto.setDonorName(rs.getString("donorName"));
-			return dto;
-		}
-		);
+					ListingDTO dto = new ListingDTO();
+					dto.setListingId(rs.getLong("listingId"));
+					dto.setLocation(rs.getString("location"));
+					dto.setItemId(rs.getLong("itemId"));
+					dto.setItemName(rs.getString("itemName"));
+					dto.setCategory(rs.getString("category"));
+					dto.setQuantity(rs.getLong("quantity"));
+					dto.setExpirationDate(rs.getDate("expirationDate"));
+					dto.setDonorId(rs.getLong("donorId"));
+					dto.setDonorName(rs.getString("donorName"));
+					return dto;
+				});
 	}
 
 	public Long saveListing(CreateListingDTO listing) {
-		String listingSql = "INSERT INTO Listing(listed_by, location, latitude, longitude, type, pickup_time_range, status) " +
-				"VALUES (?, ?, ?, ?, ?, ?, ?)";
+		String listingSql = "INSERT INTO Listing(listed_by, location, latitude, longitude, type, pickup_time_range, status) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		jdbcTemplate.update(connection -> {
@@ -124,37 +129,30 @@ public class ListingRepository {
 
 		Long listingId = keyHolder.getKey().longValue();
 
-		String listingItemSql = "INSERT INTO ListingItem (item_id, listing_id, quantity, expiration_date, status) " +
-				"VALUES (?, ?, ?, ?, ?)";
+		String listingItemSql = "INSERT INTO ListingItem (item_id, listing_id, quantity, expiration_date, status) "
+				+ "VALUES (?, ?, ?, ?, ?)";
 
 		for (CreateListingItemDTO item : listing.getListingItems()) {
-			jdbcTemplate.update(listingItemSql,
-					item.getItemId(),
-					listingId,
-					item.getQuantity(),
-					new java.sql.Date(item.getExpirationDate().getTime()),
-					item.getStatus()
-			);
+			jdbcTemplate.update(listingItemSql, item.getItemId(), listingId, item.getQuantity(),
+					new java.sql.Date(item.getExpirationDate().getTime()), item.getStatus());
 		}
 
 		return listingId;
 	}
 
+	@SuppressWarnings("deprecation")
 	public Listing findListingByListingId(Long listingId) {
-		String sql = "SELECT l.*, u.name AS donor_name, d.preferred_pickup_time, d.type, d.donor_id, l.location as listing_location, u.user_id, u.email, u.phone, u.location as user_location, u.contact_preference, " +
-				"li.listing_item_id, li.quantity, li.expiration_date AS item_expiration_date, li.status AS item_status, li.booking_id, " +
-				"i.item_id, i.item_name, i.category " +
-				"FROM Listing l " +
-				"LEFT JOIN Donor d ON l.listed_by = d.donor_id " +
-				"LEFT JOIN User u ON l.listed_by = u.user_id " +
-				"LEFT JOIN ListingItem li ON l.listing_id = li.listing_id " +
-				"LEFT JOIN Item i ON li.item_id = i.item_id " +
-				"WHERE l.listing_id = ?";
+		String sql = "SELECT l.*, u.name AS donor_name, d.preferred_pickup_time, d.type, d.donor_id, l.location as listing_location, u.user_id, u.email, u.phone, u.location as user_location, u.contact_preference, "
+				+ "li.listing_item_id, li.quantity, li.expiration_date AS item_expiration_date, li.status AS item_status, li.booking_id, "
+				+ "i.item_id, i.item_name, i.category " + "FROM Listing l "
+				+ "LEFT JOIN Donor d ON l.listed_by = d.donor_id " + "LEFT JOIN User u ON l.listed_by = u.user_id "
+				+ "LEFT JOIN ListingItem li ON l.listing_id = li.listing_id "
+				+ "LEFT JOIN Item i ON li.item_id = i.item_id " + "WHERE l.listing_id = ?";
 
-		log.info("Finding Listing Details Query for listing id {} : {}", listingId,  sql);
+		log.info("Finding Listing Details Query for listing id {} : {}", listingId, sql);
 		Map<Long, Listing> listingMap = new HashMap<>();
 
-		jdbcTemplate.query(sql, new Object[]{listingId}, (rs) -> {
+		jdbcTemplate.query(sql, new Object[] { listingId }, (rs) -> {
 			Long currentListingId = rs.getLong("listing_id");
 			Listing listing = listingMap.computeIfAbsent(currentListingId, k -> {
 				try {
@@ -206,21 +204,19 @@ public class ListingRepository {
 		return listingMap.values().iterator().next();
 	}
 
+	@SuppressWarnings("deprecation")
 	public List<Listing> findAllListingsByDonor(Long donorId) {
-		String sql = "SELECT l.*, u.name AS donor_name, d.preferred_pickup_time, d.type, d.donor_id, l.location as listing_location, u.user_id, u.email, u.phone, u.location as user_location, u.contact_preference, " +
-				"li.listing_item_id, li.quantity, li.expiration_date AS item_expiration_date, li.status AS item_status, li.booking_id, " +
-				"i.item_id, i.item_name, i.category " +
-				"FROM Listing l " +
-				"LEFT JOIN Donor d ON l.listed_by = d.donor_id " +
-				"LEFT JOIN User u ON l.listed_by = u.user_id " +
-				"LEFT JOIN ListingItem li ON l.listing_id = li.listing_id " +
-				"LEFT JOIN Item i ON li.item_id = i.item_id " +
-				"WHERE l.listed_by = ?";
+		String sql = "SELECT l.*, u.name AS donor_name, d.preferred_pickup_time, d.type, d.donor_id, l.location as listing_location, u.user_id, u.email, u.phone, u.location as user_location, u.contact_preference, "
+				+ "li.listing_item_id, li.quantity, li.expiration_date AS item_expiration_date, li.status AS item_status, li.booking_id, "
+				+ "i.item_id, i.item_name, i.category " + "FROM Listing l "
+				+ "LEFT JOIN Donor d ON l.listed_by = d.donor_id " + "LEFT JOIN User u ON l.listed_by = u.user_id "
+				+ "LEFT JOIN ListingItem li ON l.listing_id = li.listing_id "
+				+ "LEFT JOIN Item i ON li.item_id = i.item_id " + "WHERE l.listed_by = ?";
 
-		log.info("Finding All Listings Query for donor id {} : {}", donorId,  sql);
+		log.info("Finding All Listings Query for donor id {} : {}", donorId, sql);
 		Map<Long, Listing> listingMap = new HashMap<>();
 
-		jdbcTemplate.query(sql, new Object[]{donorId}, (rs) -> {
+		jdbcTemplate.query(sql, new Object[] { donorId }, (rs) -> {
 			Long currentListingId = rs.getLong("listing_id");
 			Listing listing = listingMap.computeIfAbsent(currentListingId, k -> {
 				try {
@@ -272,9 +268,8 @@ public class ListingRepository {
 		return new ArrayList<>(listingMap.values());
 	}
 
-
 	public int updateListing(UpdateListingDTO updateListingDTO) {
-		if(Objects.isNull(updateListingDTO.getListingId())) {
+		if (Objects.isNull(updateListingDTO.getListingId())) {
 			throw new RuntimeException("Listing Id not provided");
 		}
 

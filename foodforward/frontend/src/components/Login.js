@@ -1,50 +1,120 @@
+// src/components/Login.js
 import React, { useState } from 'react';
-import { useHistory, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
-    const [username, setUsername] = useState('');
+function Login() {
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        const hardcodedUsername = 'admin';
-        const hardcodedPassword = 'test123';
+        try {
+            const response = await fetch('http://localhost:8080/users/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
 
-        if (username === hardcodedUsername && password === hardcodedPassword) {
-            navigate('/dashboard');
-        } else {
-            setError('Login failed. Please check your username and password.');
+            const data = await response.json();
+
+            if (data.type === 'Recipient') {
+                navigate('/recipient_dashboard');
+            } else if (data.type === 'Donor') {
+                navigate('/donor_dashboard');
+            } else {
+                alert('Invalid user type');
+            }
+        } catch (error) {
+            console.error('Error logging in:', error);
+            alert('Login failed. Please try again.');
         }
     };
 
     return (
-        <div>
-            <h1>FoodForward</h1>
-            <h2>Login</h2>
-            <form onSubmit={handleLogin}>
-                <div>
-                    <label>Username:</label>
+        <div style={styles.container}>
+            <div style={styles.formContainer}>
+                <h2 style={styles.header}>User Login</h2>
+                <form style={styles.form} onSubmit={handleLogin}>
+                    <label style={styles.label} htmlFor="email">Email Address</label>
                     <input
-                        type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        style={styles.input}
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Enter your email"
+                        required
                     />
-                </div>
-                <div>
-                    <label>Password:</label>
+
+                    <label style={styles.label} htmlFor="password">Password</label>
                     <input
+                        style={styles.input}
                         type="password"
+                        id="password"
+                        name="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Enter your password"
+                        required
                     />
-                </div>
-                <button type="submit">Login</button>
-            </form>
-            {error && <p>{error}</p>}
+
+                    <button style={styles.button} type="submit">Login</button>
+                </form>
+            </div>
         </div>
     );
+}
+
+const styles = {
+    container: {
+        fontFamily: 'Arial, sans-serif',
+        backgroundColor: '#f4f4f4',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        margin: 0,
+    },
+    formContainer: {
+        backgroundColor: '#fff',
+        padding: '20px',
+        borderRadius: '8px',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+        width: '320px',
+        textAlign: 'center', // Center the header
+    },
+    header: {
+        color: '#333',
+        marginBottom: '20px', // Add some space below the header
+    },
+    form: {
+        display: 'flex',
+        flexDirection: 'column',
+    },
+    label: {
+        marginBottom: '6px',
+        fontWeight: 'bold',
+    },
+    input: {
+        padding: '10px',
+        marginBottom: '15px',
+        borderRadius: '4px',
+        border: '1px solid #ccc',
+        fontSize: '16px',
+    },
+    button: {
+        padding: '10px',
+        backgroundColor: '#28a745',
+        color: 'white',
+        borderRadius: '4px',
+        border: 'none',
+        fontSize: '16px',
+        cursor: 'pointer',
+    },
 };
 
 export default Login;
