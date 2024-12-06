@@ -30,7 +30,7 @@ public class BookingServiceImpl implements BookingService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getBookingDetails(Long bookingId) {
-		return bookingRepository.findBookingDetailsById(bookingId);
+	public Map<String, List<Map<String, Object>>> getBookingDetails(Long bookingId) {
+		return bookingRepository.getBookingDetails(bookingId);
 	}
 }

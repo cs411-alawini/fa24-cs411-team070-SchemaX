@@ -1,21 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 function BookingDetails() {
     const { id } = useParams();
-    const [bookingDetails, setBookingDetails] = useState([]);
+    const navigate = useNavigate();
+    const [mainQuery, setMainQuery] = useState([]);
+    const [itemSummary, setItemSummary] = useState({});
+    const [donorDetails, setDonorDetails] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchBookingDetails = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/bookings/3`);
+                const response = await fetch(`http://localhost:8080/bookings/${id}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch booking details');
                 }
                 const data = await response.json();
-                setBookingDetails(data);
+                setMainQuery(data.mainQuery || []);
+                setItemSummary(data.itemSummary?.[0] || {});
+                setDonorDetails(data.donorDetails?.[0] || {});
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -26,25 +31,28 @@ function BookingDetails() {
         fetchBookingDetails();
     }, [id]);
 
+    // Handle loading and error states
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error}</p>;
 
-    const commonDetails = bookingDetails[0];
+    // Extract common details (assumes all items share these attributes)
+    const commonDetails = mainQuery.length > 0 ? mainQuery[0] : null;
 
+    // Get status color dynamically
     const getStatusColor = (status) => {
         switch (status) {
             case 'CONFIRMED':
-                return '#4caf50'; 
+                return '#4caf50'; // Green
             case 'PENDING':
-                return '#ff9800';
+                return '#ff9800'; // Orange
             case 'COMPLETED':
-                return '#2196f3';
+                return '#2196f3'; // Blue
             case 'CANCELLED':
-                return '#f44336';
+                return '#f44336'; // Red
             case 'BOOKED':
-                return '#9c27b0';
+                return '#9c27b0'; // Purple
             default:
-                return '#757575';
+                return '#757575'; // Gray
         }
     };
 
@@ -53,38 +61,60 @@ function BookingDetails() {
             <h2 style={styles.header}>Booking Details</h2>
 
             <div style={styles.section}>
-                <h3 style={styles.subHeader}>Pickup Details</h3>
-                <p><strong>Date:</strong> {commonDetails.pickupDate}</p>
-                <p><strong>Time:</strong> {commonDetails.pickupTime}</p>
-                <p><strong>Location:</strong> {commonDetails.pickupLocation}</p>
-            </div>
-
-            <div style={styles.section}>
-                <h3 style={styles.subHeader}>Item Details</h3>
-                {bookingDetails.map((item, index) => (
+                <h3 style={styles.subHeader}>Donation Information</h3>
+                {mainQuery.map((item, index) => (
                     <div key={index} style={styles.itemSection}>
-                        <p><strong>Name:</strong> {item.itemName}</p>
+                        <p><strong>Item Name:</strong> {item.itemName}</p>
                         <p><strong>Quantity:</strong> {item.quantity}</p>
-                        <p><strong>Expiration Date:</strong> {item.expirationDate}</p>
+                        <p><strong>Expiry Date:</strong> {item.expirationDate}</p>
                     </div>
                 ))}
             </div>
 
-            <div style={styles.section}>
-                <h3 style={styles.subHeader}>Recipient Information</h3>
-                <p><strong>Name:</strong> {commonDetails.recipientName}</p>
-                <p><strong>Email:</strong> {commonDetails.email}</p>
-                <p><strong>Phone Number:</strong> {commonDetails.phoneNumber}</p>
-            </div>
-
-            <div style={styles.statusSection}>
-                <h3 style={styles.subHeader}>Status</h3>
-                <div style={{ ...styles.status, backgroundColor: getStatusColor(commonDetails.status) }}>
-                    {commonDetails.status}
+            {commonDetails && (
+                <div style={styles.section}>
+                    <h3 style={styles.subHeader}>Recipient Information</h3>
+                    <p><strong>Recipient Name:</strong> {commonDetails.recipientName}</p>
+                    <p><strong>Email:</strong> {commonDetails.email}</p>
+                    <p><strong>Phone Number:</strong> {commonDetails.phoneNumber}</p>
                 </div>
+            )}
+
+            {commonDetails && (
+                <div style={styles.section}>
+                    <h3 style={styles.subHeader}>Pickup Details</h3>
+                    <p><strong>Pickup Date:</strong> {commonDetails.pickupDate}</p>
+                    <p><strong>Pickup Time:</strong> {commonDetails.pickupTime}</p>
+                    <p><strong>Pickup Location:</strong> {commonDetails.pickupLocation}</p>
+                </div>
+            )}
+
+            <div style={styles.section}>
+                <h3 style={styles.subHeader}>Item Summary</h3>
+                <p><strong>Total Items:</strong> {itemSummary.totalItems || 0}</p>
+                <p><strong>Total Quantity:</strong> {itemSummary.totalQuantity || 0} kg</p>
+                <p><strong>Latest Expiration Date:</strong> {itemSummary.latestExpirationDate || 'N/A'}</p>
             </div>
 
-            <button style={styles.button} onClick={() => window.location.href = '/donor_dashboard'}>
+            <div style={styles.section}>
+                <h3 style={styles.subHeader}>Donor Details</h3>
+                <p><strong>Name:</strong> {donorDetails.donorName || 'N/A'}</p>
+                <p><strong>Email:</strong> {donorDetails.donorEmail || 'N/A'}</p>
+                <p><strong>Phone:</strong> {donorDetails.donorPhone || 'N/A'}</p>
+                <p><strong>Average Rating:</strong> {donorDetails.averageRating ? donorDetails.averageRating.toFixed(1) : 'N/A'}</p>
+                <p><strong>Total Reviews:</strong> {donorDetails.totalReviews || 0}</p>
+            </div>
+
+            {commonDetails && (
+                <div style={styles.statusSection}>
+                    <h3 style={styles.subHeader}>Status</h3>
+                    <div style={{ ...styles.status, backgroundColor: getStatusColor(commonDetails.status) }}>
+                        {commonDetails.status}
+                    </div>
+                </div>
+            )}
+
+            <button style={styles.button} onClick={() => navigate('/donor_dashboard')}>
                 Back to Dashboard
             </button>
         </div>
