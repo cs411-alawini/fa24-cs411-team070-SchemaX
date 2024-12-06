@@ -2,6 +2,7 @@ package com.schemax.foodforward.controller;
 
 import java.util.List;
 
+import com.schemax.foodforward.model.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,6 +49,16 @@ public class ListingController {
 	@PostMapping("/updateListing")
 	public ResponseEntity<String> updateListing(@RequestBody UpdateListingDTO updateListingDTO) {
 		return listingService.updateListing(updateListingDTO);
+	}
+
+	@GetMapping("/items")
+	public ResponseEntity<List<Item>> getItems(@RequestParam(required = false) String searchQuery) {
+		return listingService.getItems(searchQuery);
+	}
+
+	@PostMapping("/item")
+	public ResponseEntity<String> saveItem(@RequestBody Item createItem) {
+		return listingService.saveItem(createItem);
 	}
 
 	// TODO: update Listing Item
