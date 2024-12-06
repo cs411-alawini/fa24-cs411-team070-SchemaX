@@ -12,5 +12,5 @@ import com.schemax.foodforward.dto.CreateBookingDTO;
 public interface BookingService {
 	ResponseEntity<String> addBooking(CreateBookingDTO createBookingDTO);
 
-	public List<Map<String, Object>> getBookingDetails(Long bookingId);
+	public Map<String, List<Map<String, Object>>> getBookingDetails(Long bookingId);
 }

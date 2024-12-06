@@ -33,10 +33,11 @@ public class BookingController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<List<Map<String, Object>>> getBookingDetails(@PathVariable Long id) {
-		List<Map<String, Object>> bookingDetails = bookingService.getBookingDetails(id);
-		if (!bookingDetails.isEmpty()) {
-			return ResponseEntity.ok(bookingDetails);
+	public ResponseEntity<Map<String, List<Map<String, Object>>>> getBookingDetails(@PathVariable Long id) {
+		Map<String, List<Map<String, Object>>> details = bookingService.getBookingDetails(id);
+
+		if (!details.isEmpty()) {
+			return ResponseEntity.ok(details);
 		} else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
