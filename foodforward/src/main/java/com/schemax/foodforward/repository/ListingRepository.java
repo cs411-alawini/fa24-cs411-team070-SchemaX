@@ -318,4 +318,40 @@ public class ListingRepository {
 
 		return fieldsToUpdate;
 	}
+
+	public Long saveItem(Item item) {
+		String itemSql = "INSERT INTO Item(item_name, category) "
+				+ "VALUES (?, ?)";
+
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+		jdbcTemplate.update(connection -> {
+			PreparedStatement ps = connection.prepareStatement(itemSql, Statement.RETURN_GENERATED_KEYS);
+			ps.setString(1, item.getItemName());
+			ps.setString(2, item.getCategory());
+			return ps;
+		}, keyHolder);
+
+		Long itemId = keyHolder.getKey().longValue();
+		return itemId;
+	}
+
+	@SuppressWarnings("deprecation")
+	public List<Item> getItems(String searchQuery) {
+		String sql = "SELECT * from Item ";
+
+		if(Objects.nonNull(searchQuery) && !searchQuery.isEmpty()) {
+			sql += "WHERE CONCAT(item_name, category) LIKE '%" + searchQuery +"%'";
+		}
+		log.info("Finding All Items query : {}" , sql);
+
+		List<Item> items = jdbcTemplate.query(sql, (rs, rowNum) -> {
+			Item item = new Item();
+			item.setItemId(rs.getLong("item_id"));
+			item.setItemName(rs.getString("item_name"));
+			item.setCategory(rs.getString("category"));
+			return item;
+		});
+
+		return items;
+	}
 }

@@ -2,6 +2,7 @@ package com.schemax.foodforward.service.impl;
 
 import java.util.List;
 
+import com.schemax.foodforward.model.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -83,6 +84,27 @@ public class ListingServiceImpl implements ListingService {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error updating listing: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public ResponseEntity<List<Item>> getItems(String searchQuery) {
+        List<Item> items = listingRepository.getItems(searchQuery);
+        if (items != null) {
+            return ResponseEntity.ok(items);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> saveItem(Item item) {
+        try {
+            Long itemId = listingRepository.saveItem(item);
+            return ResponseEntity.ok("Item added successfully with ID: " + itemId);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error adding item: " + e.getMessage());
         }
     }
 }

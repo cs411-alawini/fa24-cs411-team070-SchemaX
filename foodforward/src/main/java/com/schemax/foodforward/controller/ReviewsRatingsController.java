@@ -1,14 +1,15 @@
 package com.schemax.foodforward.controller;
 
+import com.schemax.foodforward.model.Review;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.schemax.foodforward.dto.CreateReviewDTO;
 import com.schemax.foodforward.service.ReviewService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/reviews")
@@ -24,4 +25,8 @@ public class ReviewsRatingsController {
 		return reviewService.addReview(createReviewDTO);
 	}
 
+	@GetMapping("/getReviews")
+	public ResponseEntity<List<Review>> getReviews(@RequestParam Long donorId) {
+		return reviewService.getReviews(donorId);
+	}
 }
