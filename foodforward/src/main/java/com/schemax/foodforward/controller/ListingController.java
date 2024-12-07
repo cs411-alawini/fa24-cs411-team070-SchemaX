@@ -2,7 +2,6 @@ package com.schemax.foodforward.controller;
 
 import java.util.List;
 
-import com.schemax.foodforward.model.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.schemax.foodforward.dto.CreateListingDTO;
-import com.schemax.foodforward.dto.ListingDTO;
 import com.schemax.foodforward.dto.ListingSearchDTO;
 import com.schemax.foodforward.dto.UpdateListingDTO;
+import com.schemax.foodforward.model.Item;
 import com.schemax.foodforward.model.Listing;
 import com.schemax.foodforward.service.ListingService;
 
@@ -27,7 +26,7 @@ public class ListingController {
 	private ListingService listingService;
 
 	@PostMapping("/search")
-	public List<ListingDTO> searchListings(@RequestBody ListingSearchDTO searchDTO) {
+	public List<Listing> searchListings(@RequestBody ListingSearchDTO searchDTO) {
 		return listingService.searchListings(searchDTO);
 	}
 

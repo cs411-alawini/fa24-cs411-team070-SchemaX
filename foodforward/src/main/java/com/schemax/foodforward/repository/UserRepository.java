@@ -11,6 +11,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import com.schemax.foodforward.model.Donor;
+import com.schemax.foodforward.model.Recipient;
 import com.schemax.foodforward.model.User;
 
 @Repository
@@ -63,6 +65,8 @@ public class UserRepository {
 				user.setEmail(rs.getString("email"));
 				user.setPhone(rs.getString("phone"));
 				user.setType(rs.getString("type"));
+				user.setLatitude(rs.getDouble("latitude"));
+				user.setLongitude(rs.getDouble("longitude"));
 				return user;
 			});
 		} catch (EmptyResultDataAccessException e) {
@@ -86,5 +90,59 @@ public class UserRepository {
 				rs.getString("type")
 			)
 		);
+	}
+	
+	public Long insertUser(User user) {
+		try {
+			String sql = """
+					INSERT INTO User (name, location, email, phone, type, password)
+					VALUES (?, ?, ?, ?, ?, ?)
+					""";
+	
+			KeyHolder keyHolder = new GeneratedKeyHolder();
+	
+			jdbcTemplate.update(connection -> {
+				PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+				ps.setString(1, user.getName());
+				ps.setString(2, user.getLocation());
+				ps.setString(3, user.getEmail());
+				ps.setString(4, user.getPhone());
+				ps.setString(5, user.getType());
+				ps.setString(6, user.getPassword());
+				return ps;
+			}, keyHolder);
+	
+			return keyHolder.getKey().longValue();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+
+	public void insertDonor(Donor donor) {
+		try {
+			String sql = """
+					INSERT INTO Donor (type, user_id)
+					VALUES (?, ?, ?, ?)
+					""";
+
+			jdbcTemplate.update(sql, donor.getType(), donor.getUserId());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void insertRecipient(Recipient recipient) {
+		try {
+			String sql = """
+					INSERT INTO Recipient (notification_enabled, user_id)
+					VALUES (?, ?, ?)
+					""";
+
+			jdbcTemplate.update(sql, recipient.isNotificationEnabled(), recipient.getUserId());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -50,6 +50,7 @@ public class DonorRepository {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public Recipient findRecipientById(Long recipientId) {
 		String sql = "SELECT r.recipient_id, r.preferences, r.notification_enabled, u.* " +
 				"FROM Recipient r "
