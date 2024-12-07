@@ -1,6 +1,7 @@
 package com.schemax.foodforward.repository;
 
 
+import com.schemax.foodforward.model.Recipient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -43,6 +44,35 @@ public class DonorRepository {
 				donor.setType(rs.getString("type"));
 
 				return donor;
+			});
+		} catch (EmptyResultDataAccessException e) {
+			return null; // Return null if no donor is found
+		}
+	}
+
+	public Recipient findRecipientById(Long recipientId) {
+		String sql = "SELECT r.recipient_id, r.preferences, r.notification_enabled, u.* " +
+				"FROM Recipient r "
+				+ "LEFT JOIN User u ON r.user_id = u.user_id "
+				+ "WHERE r.recipient_id = ?";
+
+		log.info("Finding Recipient Details for recipient id {} : {}", recipientId, sql);
+
+		try {
+			return jdbcTemplate.queryForObject(sql, new Object[]{recipientId}, (rs, rowNum) -> {
+				Recipient recipient = new Recipient();
+				recipient.setRecipientId(rs.getLong("recipient_id"));
+				recipient.setType(rs.getString("preferences"));
+				recipient.setNotificationEnabled(rs.getBoolean("notification_enabled"));
+				recipient.setUserId(rs.getLong("user_id"));
+				recipient.setName(rs.getString("name"));
+				recipient.setLocation(rs.getString("location"));
+				recipient.setContactPreference(rs.getString("contact_preference"));
+				recipient.setEmail(rs.getString("email"));
+				recipient.setPhone(rs.getString("phone"));
+				recipient.setType(rs.getString("type"));
+
+				return recipient;
 			});
 		} catch (EmptyResultDataAccessException e) {
 			return null; // Return null if no donor is found

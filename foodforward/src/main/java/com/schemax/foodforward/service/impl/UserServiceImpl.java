@@ -1,5 +1,6 @@
 package com.schemax.foodforward.service.impl;
 
+import com.schemax.foodforward.model.Recipient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,16 @@ public class UserServiceImpl implements UserService {
 		Donor donor = donorRepository.findDonorById(donorId);
 		if (donor != null) {
 			return ResponseEntity.ok(donor);
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+
+	@Override
+	public ResponseEntity<Recipient> getRecipientById(Long recipientId) {
+		Recipient recipient = donorRepository.findRecipientById(recipientId);
+		if (recipient != null) {
+			return ResponseEntity.ok(recipient);
 		} else {
 			return ResponseEntity.notFound().build();
 		}

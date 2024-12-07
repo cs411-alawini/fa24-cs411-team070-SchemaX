@@ -3,6 +3,7 @@ package com.schemax.foodforward.service.impl;
 import java.util.List;
 import java.util.Map;
 
+import com.schemax.foodforward.model.Booking;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,5 +33,27 @@ public class BookingServiceImpl implements BookingService {
 	@Override
 	public Map<String, List<Map<String, Object>>> getBookingDetails(Long bookingId) {
 		return bookingRepository.getBookingDetails(bookingId);
+	}
+
+	@Override
+	public ResponseEntity<List<Booking>> getDonorBookings(Long donorId) {
+		List<Booking> details = bookingRepository.getDonorBookings(donorId);
+
+		if (!details.isEmpty()) {
+			return ResponseEntity.ok(details);
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+	}
+
+	@Override
+	public ResponseEntity<List<Booking>> getRecipientBookings(Long recipientId) {
+		List<Booking> details = bookingRepository.getRecipientBookings(recipientId);
+
+		if (!details.isEmpty()) {
+			return ResponseEntity.ok(details);
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
 	}
 }

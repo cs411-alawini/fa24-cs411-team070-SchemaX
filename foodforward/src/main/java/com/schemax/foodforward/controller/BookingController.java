@@ -3,15 +3,11 @@ package com.schemax.foodforward.controller;
 import java.util.List;
 import java.util.Map;
 
+import com.schemax.foodforward.model.Booking;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.schemax.foodforward.dto.CreateBookingDTO;
 import com.schemax.foodforward.service.BookingService;
@@ -41,5 +37,16 @@ public class BookingController {
 		} else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
+	}
+
+	@GetMapping("/getDonorBookings")
+	public ResponseEntity<List<Booking>> getDonorBookings(@RequestParam Long donorId) {
+		return bookingService.getDonorBookings(donorId);
+
+	}
+
+	@GetMapping("/getRecipientBookings")
+	public ResponseEntity<List<Booking>> getRecipientBookings(@RequestParam Long recipientId) {
+		return bookingService.getRecipientBookings(recipientId);
 	}
 }
