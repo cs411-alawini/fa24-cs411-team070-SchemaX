@@ -113,67 +113,6 @@ public class BookingRepository {
 	}
 
 
-//	public Map<String, List<Map<String, Object>>> getDonorBookings(Long donorId) {
-//		Map<String, List<Map<String, Object>>> responseData = new HashMap<>();
-//
-//		jdbcTemplate.execute("CALL GetBookingDetails(?)", (CallableStatementCallback<Void>) cs -> {
-//			cs.setLong(1, bookingId);
-//
-//			try (ResultSet rs = cs.executeQuery()) {
-//				List<Map<String, Object>> mainQuery = new ArrayList<>();
-//				while (rs.next()) {
-//					Map<String, Object> mainDetails = new HashMap<>();
-//					mainDetails.put("itemName", rs.getString("itemName"));
-//					mainDetails.put("quantity", rs.getLong("quantity"));
-//					mainDetails.put("expirationDate", rs.getDate("expirationDate"));
-//					mainDetails.put("recipientName", rs.getString("recipientName"));
-//					mainDetails.put("email", rs.getString("email"));
-//					mainDetails.put("phoneNumber", rs.getString("phoneNumber"));
-//					mainDetails.put("pickupDate", rs.getTimestamp("pickupDate"));
-//					mainDetails.put("pickupTime", rs.getString("pickupTime"));
-//					mainDetails.put("pickupLocation", rs.getString("pickupLocation"));
-//					mainDetails.put("status", rs.getString("status"));
-//					mainQuery.add(mainDetails);
-//				}
-//				responseData.put("mainQuery", mainQuery);
-//			}
-//
-//			if (cs.getMoreResults()) {
-//				try (ResultSet rs = cs.getResultSet()) {
-//					List<Map<String, Object>> itemSummary = new ArrayList<>();
-//					while (rs.next()) {
-//						Map<String, Object> summary = new HashMap<>();
-//						summary.put("totalItems", rs.getInt("totalItems"));
-//						summary.put("totalQuantity", rs.getInt("totalQuantity"));
-//						summary.put("latestExpirationDate", rs.getDate("latestExpirationDate"));
-//						itemSummary.add(summary);
-//					}
-//					responseData.put("itemSummary", itemSummary);
-//				}
-//			}
-//
-//			if (cs.getMoreResults()) {
-//				try (ResultSet rs = cs.getResultSet()) {
-//					List<Map<String, Object>> donorDetails = new ArrayList<>();
-//					while (rs.next()) {
-//						Map<String, Object> donorInfo = new HashMap<>();
-//						donorInfo.put("donorId", rs.getLong("donorId"));
-//						donorInfo.put("donorName", rs.getString("donorName"));
-//						donorInfo.put("donorEmail", rs.getString("donorEmail"));
-//						donorInfo.put("donorPhone", rs.getString("donorPhone"));
-//						donorInfo.put("averageRating", rs.getDouble("averageRating"));
-//						donorInfo.put("totalReviews", rs.getInt("totalReviews"));
-//						donorDetails.add(donorInfo);
-//					}
-//					responseData.put("donorDetails", donorDetails);
-//				}
-//			}
-//
-//			return null;
-//		});
-//
-//		return responseData;
-//	}
 	public List<Booking> getRecipientBookings(Long recipientId) {
 		String sql = "SELECT b.*, it.item_id, it.item_name, it.category, li.quantity, li.listing_item_id, li.expiration_date, l.listing_id, li.status, l.location, d.donor_id, u.name, u.phone, u.email " +
 				"FROM Booking b " +
