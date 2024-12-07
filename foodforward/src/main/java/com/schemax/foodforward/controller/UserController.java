@@ -1,5 +1,6 @@
 package com.schemax.foodforward.controller;
 
+import com.schemax.foodforward.model.Recipient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,11 @@ public class UserController {
 	@GetMapping("/donor")
 	public ResponseEntity<Donor> getDonorDetails(@RequestParam Long donorId) {
 		return userService.getDonorById(donorId);
+	}
+
+	@GetMapping("/recipient")
+	public ResponseEntity<Recipient> getRecipientDetails(@RequestParam Long recipientId) {
+		return userService.getRecipientById(recipientId);
 	}
 
 	@PostMapping("/login")

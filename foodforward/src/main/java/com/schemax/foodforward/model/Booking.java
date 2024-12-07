@@ -1,6 +1,7 @@
 package com.schemax.foodforward.model;
 
 import java.util.Date;
+import java.util.List;
 
 import lombok.Data;
 
@@ -8,12 +9,18 @@ import lombok.Data;
 public class Booking {
 
 	private Long bookingId;
+	private Long donorId;
 
 	private Long bookedBy;
 
 	private String bookingStatus;
+	private String name;
+	private String phone;
+	private String email;
 
 	private Date pickupDatetime;
+
+	private List<ListingItem> listingItems;
 
 	public Long getBookingId() {
 		return bookingId;
