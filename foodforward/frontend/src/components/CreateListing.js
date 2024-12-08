@@ -3,13 +3,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import CreateItem from "./CreateItem";
 
 
-
 const CreateListing = () => {
   const navigate = useNavigate();
   const { donorId } = useParams();
   const [listingItems, setListingItems] = useState([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [newItem, setNewItem] = useState({
+    itemId: 0,
     name: "",
     quantity: 1,
     category: "",
@@ -45,7 +45,7 @@ const CreateListing = () => {
     } else {
       setListingItems([...listingItems, newItem]);
     }
-    setNewItem({ name: "", expiryDate: "", notes: "", quantity: 1 });
+    setNewItem({ itemId: 0, name: "", expiryDate: "", category: "", quantity: 1 });
     setIsFormVisible(false); 
   };
 
@@ -59,9 +59,7 @@ const CreateListing = () => {
     setListingItems(updatedItems);
   };
 
-  const handleSaveListing = () => {
-
-    
+  const handleSaveListing = async () => {
 
       if (listingItems.length === 0) {
           alert("Please add at least one item to the listing before saving.");
@@ -79,24 +77,35 @@ const CreateListing = () => {
   
     
     const listingData = {
-
+      
+      donorId: donorId,
       location: additionalInputs.pickupLocation,
       pickupTimeRange: `${additionalInputs.pickupStart} - ${additionalInputs.pickupEnd}`,
       status: "AVAILABLE",
       listingItems: listingItems.map(item => ({
-        quantity: item.quantity,
-        item: {
-          itemName: item.name,
-          category: item.category, 
-        },
+        itemId: item.itemId,
         expirationDate: item.expiryDate,
+        quantity: item.quantity,
         status: "AVAILABLE",
       })),
     };
 
-    console.log("Listing Data:", listingData);
     
     // ideally we should send this data to the backend/database
+
+    
+    const response = await fetch('http://localhost:8080/listings/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(listingData),
+    });
+
+    if (!response.ok) {
+        alert("Failed to create listing:");
+    }
+  
     navigate(`/users/${donorId}/donor_dashboard`, { state: { listingCreated: true} });
   };
   
@@ -230,6 +239,7 @@ const CreateListing = () => {
         handleInputChange={handleInputChange}
         handleSubmit={handleSubmit}
         newItem={newItem}
+        setNewItem={setNewItem}
         editingIndex={editingIndex} 
       />
 
