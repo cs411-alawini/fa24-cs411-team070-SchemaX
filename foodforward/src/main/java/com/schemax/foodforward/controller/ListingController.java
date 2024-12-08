@@ -27,6 +27,7 @@ public class ListingController {
 
 	@PostMapping("/search")
 	public List<Listing> searchListings(@RequestBody ListingSearchDTO searchDTO) {
+		System.out.println(searchDTO);
 		return listingService.searchListings(searchDTO);
 	}
 

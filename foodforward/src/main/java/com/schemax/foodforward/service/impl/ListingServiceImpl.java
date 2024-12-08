@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.schemax.foodforward.dto.CreateListingDTO;
 import com.schemax.foodforward.dto.ListingSearchDTO;
 import com.schemax.foodforward.dto.UpdateListingDTO;
+import com.schemax.foodforward.dto.ListingDTO;
 import com.schemax.foodforward.model.Item;
 import com.schemax.foodforward.model.Listing;
 import com.schemax.foodforward.repository.DonorRepository;
@@ -40,7 +41,10 @@ public class ListingServiceImpl implements ListingService {
                 searchDTO.getLocation(),
                 searchDTO.getDistance(),
                 searchDTO.getUserLongitude(),
-                searchDTO.getUserLatitude());
+                searchDTO.getUserLatitude(),
+            searchDTO.getRecipientId());
+        System.out.println("LISTINGS");
+        System.out.println(listings);
         return listings;
     }
 
