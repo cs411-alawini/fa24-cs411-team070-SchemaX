@@ -1,4 +1,3 @@
-// src/components/Login.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -20,12 +19,11 @@ function Login() {
 
             const data = await response.json();
 
+
             if (data.type === 'Recipient') {
-                localStorage.setItem('recipientId', data.userId);
-                navigate('/recipient_dashboard');
+                navigate(`/users/${data.recipientId}/recipient_dashboard`);
             } else if (data.type === 'Donor') {
-                localStorage.setItem('donorId', data.userId);
-                navigate('/donor_dashboard');
+                navigate(`/users/${data.donorId}/donor_dashboard`);
             } else {
                 alert('Invalid user type');
             }
@@ -87,11 +85,11 @@ const styles = {
         borderRadius: '8px',
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
         width: '320px',
-        textAlign: 'center', // Center the header
+        textAlign: 'center',
     },
     header: {
         color: '#333',
-        marginBottom: '20px', // Add some space below the header
+        marginBottom: '20px',
     },
     form: {
         display: 'flex',

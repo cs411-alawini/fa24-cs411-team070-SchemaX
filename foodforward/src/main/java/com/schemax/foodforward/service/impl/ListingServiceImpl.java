@@ -41,7 +41,10 @@ public class ListingServiceImpl implements ListingService {
                 searchDTO.getLocation(),
                 searchDTO.getDistance(),
                 searchDTO.getUserLongitude(),
-                searchDTO.getUserLatitude());
+                searchDTO.getUserLatitude(),
+            searchDTO.getRecipientId());
+        System.out.println("LISTINGS");
+        System.out.println(listings);
         return listings;
     }
 

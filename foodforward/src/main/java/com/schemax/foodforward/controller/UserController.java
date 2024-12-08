@@ -1,6 +1,5 @@
 package com.schemax.foodforward.controller;
 
-import com.schemax.foodforward.model.Recipient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.schemax.foodforward.model.Donor;
+import com.schemax.foodforward.model.Recipient;
 import com.schemax.foodforward.model.User;
 import com.schemax.foodforward.service.UserService;
 
@@ -46,6 +46,17 @@ public class UserController {
 			return ResponseEntity.ok(loggedInUser);
 		} else {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+		}
+	}
+
+	@PostMapping("/register")
+	public ResponseEntity<String> registerUser(@RequestBody User user) {
+		try {
+			userService.registerUser(user);
+			return ResponseEntity.ok("User registered successfully");
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("Error registering user: " + e.getMessage());
 		}
 	}
 }

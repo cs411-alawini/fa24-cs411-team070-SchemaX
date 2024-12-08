@@ -48,45 +48,89 @@ public class ListingRepository {
 
 	@SuppressWarnings("deprecation")
 	public List<ListingDTO> findListingsWithFilters(String foodType, Long quantityNeeded, Date expiryDate,
-			String pickupTimeStart, String pickupTimeEnd, String location, Double distance, Double userLongitude,
-			Double userLatitude) {
+													String pickupTimeStart, String pickupTimeEnd, String location,
+													Double distance, Double userLongitude, Double userLatitude, String recipientId) {
 
 		String sql = """
-				   SELECT
-				        l.listing_id AS listingId,
-				        l.location AS location,
-				        li.item_id AS itemId,
-				        i.item_name AS itemName,
-				        i.category AS category,
-				        li.quantity AS quantity,
-				        li.expiration_date AS expirationDate,
-				        d.donor_id AS donorId,
-				        u.name AS donorName
-				    FROM Listing l
-				    JOIN ListingItem li ON l.listing_id = li.listing_id
-				    JOIN Item i ON li.item_id = i.item_id
-				    JOIN Donor d ON l.listed_by = d.donor_id
-				    JOIN User u ON d.user_id = u.user_id
-				    WHERE
-				        (? IS NULL OR i.category = ?)
-				        AND (? IS NULL OR li.quantity >= ?)
-				        AND (? IS NULL OR li.expiration_date <= ?)
-				        AND (? IS NULL OR l.pickup_time_range >= ?)
-				        AND (? IS NULL OR l.pickup_time_range <= ?)
-				        AND (? IS NULL OR l.location LIKE CONCAT('%', ?, '%'))
-				        AND (? IS NULL OR (
-				            ? IS NOT NULL AND
-				            ? IS NOT NULL AND
-				            ST_Distance_Sphere(POINT(l.longitude, l.latitude), POINT(?, ?)) <= ?))
-				        AND l.status = 'ACTIVE'
-				        AND li.status = 'AVAILABLE'
-				        AND (li.expiration_date IS NULL OR li.expiration_date > CURRENT_DATE)
-				""";
+            SELECT
+                l.listing_id AS listingId,
+                l.location AS location,
+                li.item_id AS itemId,
+                i.item_name AS itemName,
+                i.category AS category,
+                li.quantity AS quantity,
+                li.expiration_date AS expirationDate,
+                d.donor_id AS donorId,
+                u.name AS donorName,
+                1 AS priority  -- Recommendations have higher priority
+            FROM Listing l
+            JOIN ListingItem li ON l.listing_id = li.listing_id
+            JOIN Item i ON li.item_id = i.item_id
+            JOIN Donor d ON l.listed_by = d.donor_id
+            JOIN User u ON d.user_id = u.user_id
+            JOIN Recommendation r ON r.donor_id = d.donor_id AND r.recipient_id = ?
+            WHERE
+                (? IS NULL OR i.category = ?)
+                AND (? IS NULL OR li.quantity >= ?)
+                AND (? IS NULL OR li.expiration_date <= ?)
+                AND (? IS NULL OR l.pickup_time_range >= ?)
+                AND (? IS NULL OR l.pickup_time_range <= ?)
+                AND (? IS NULL OR l.location LIKE CONCAT('%', ?, '%'))
+                AND (? IS NULL OR (
+                    ? IS NOT NULL AND
+                    ? IS NOT NULL AND
+                    ST_Distance_Sphere(POINT(l.longitude, l.latitude), POINT(?, ?)) <= ?))
+                AND l.status = 'ACTIVE'
+                AND li.status = 'AVAILABLE'
+                AND (li.expiration_date IS NULL OR li.expiration_date > CURRENT_DATE)
+
+            UNION ALL
+
+            SELECT
+                l.listing_id AS listingId,
+                l.location AS location,
+                li.item_id AS itemId,
+                i.item_name AS itemName,
+                i.category AS category,
+                li.quantity AS quantity,
+                li.expiration_date AS expirationDate,
+                d.donor_id AS donorId,
+                u.name AS donorName,
+                2 AS priority  -- Regular listings have lower priority
+            FROM Listing l
+            JOIN ListingItem li ON l.listing_id = li.listing_id
+            JOIN Item i ON li.item_id = i.item_id
+            JOIN Donor d ON l.listed_by = d.donor_id
+            JOIN User u ON d.user_id = u.user_id
+            WHERE
+                (? IS NULL OR i.category = ?)
+                AND (? IS NULL OR li.quantity >= ?)
+                AND (? IS NULL OR li.expiration_date <= ?)
+                AND (? IS NULL OR l.pickup_time_range >= ?)
+                AND (? IS NULL OR l.pickup_time_range <= ?)
+                AND (? IS NULL OR l.location LIKE CONCAT('%', ?, '%'))
+                AND (? IS NULL OR (
+                    ? IS NOT NULL AND
+                    ? IS NOT NULL AND
+                    ST_Distance_Sphere(POINT(l.longitude, l.latitude), POINT(?, ?)) <= ?))
+                AND l.status = 'ACTIVE'
+                AND li.status = 'AVAILABLE'
+                AND (li.expiration_date IS NULL OR li.expiration_date > CURRENT_DATE)
+
+            ORDER BY 9,1;
+        """;
 
 		return jdbcTemplate.query(sql,
-				new Object[] { foodType, foodType, quantityNeeded, quantityNeeded, expiryDate, expiryDate,
-						pickupTimeStart, pickupTimeStart, pickupTimeEnd, pickupTimeEnd, location, location, distance,
-						userLatitude, userLongitude, userLongitude, userLatitude, distance },
+				new Object[] {
+						Integer.parseInt(recipientId),  // For the Recommendation query
+						foodType, foodType, quantityNeeded, quantityNeeded, expiryDate, expiryDate,
+						pickupTimeStart, pickupTimeStart, pickupTimeEnd, pickupTimeEnd, location, location,
+						distance, userLatitude, userLongitude, userLongitude, userLatitude, distance,
+						// Regular listings parameters
+						foodType, foodType, quantityNeeded, quantityNeeded, expiryDate, expiryDate,
+						pickupTimeStart, pickupTimeStart, pickupTimeEnd, pickupTimeEnd, location, location,
+						distance, userLatitude, userLongitude, userLongitude, userLatitude, distance
+				},
 				(rs, rowNum) -> {
 					ListingDTO dto = new ListingDTO();
 					dto.setListingId(rs.getLong("listingId"));
@@ -98,9 +142,13 @@ public class ListingRepository {
 					dto.setExpirationDate(rs.getDate("expirationDate"));
 					dto.setDonorId(rs.getLong("donorId"));
 					dto.setDonorName(rs.getString("donorName"));
+					dto.setPriority(new Long(rs.getLong("priority")));
+					System.out.println("dto");
+					System.out.println(dto);
 					return dto;
 				});
 	}
+
 
 	public Long saveListing(CreateListingDTO listing) {
 		String listingSql = "INSERT INTO Listing(listed_by, location, latitude, longitude, type, pickup_time_range, status) "

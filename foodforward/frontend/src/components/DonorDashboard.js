@@ -1,33 +1,69 @@
-import React, {useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
+
+function StarRating({ rating, maxStars = 5 }) {
+    const stars = [];
+    for (let i = 1; i <= maxStars; i++) {
+        stars.push(
+            <span key={i} style={{ color: i <= rating ? '#000000' : '#E0E0E0', fontSize: '20px' }}>★</span>
+        );
+    }
+    return <span>{stars}</span>;
+}
 
 function DonorDashboard() {
+    const { donorId } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const [donorInfo, setDonorInfo] = useState(null);
+    const [donations, setDonations] = useState([]);
     const [bookings, setBookings] = useState([]);
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [showAlert, setShowAlert] = useState(false);
+    const [containerHeight, setContainerHeight] = useState('auto');
+
+    
+
+
+    useEffect(() => {
+        if (location.state?.listingCreated) {
+            setShowAlert(true);
+            setTimeout(() => {
+                setShowAlert(false);
+            }, 2500);
+            navigate(location.pathname, { replace: true, state: { ...location.state, listingCreated: false } });
+        }
+    }, [location, navigate]);
 
     useEffect(() => {
         const fetchDonorData = async () => {
-            const donorId = localStorage.getItem('donorId'); // Get donorId from localStorage
             if (!donorId) {
-                navigate('/login'); // Redirect to login if donorId is missing
+                navigate('/login'); 
                 return;
             }
-            console.log('Donor ID:', donorId);
 
             try {
-                const response = await fetch(`http://localhost:8080/users/donor?donorId=${donorId}`);
-                if (!response.ok) {
+                const [profileRes, donationsRes, bookingRes, reviewsRes] = await Promise.all([
+                    fetch(`http://localhost:8080/users/donor?donorId=${donorId}`),
+                    fetch(`http://localhost:8080/listings/getAllListings?donorId=${donorId}`),
+                    fetch(`http://localhost:8080/bookings/getDonorBookings?donorId=${donorId}`),
+                    fetch(`http://localhost:8080/reviews/getReviews?donorId=${donorId}`),
+                ]);
+
+                if (!profileRes.ok || !donationsRes.ok || !bookingRes.ok || !reviewsRes.ok) {
                     throw new Error('Failed to fetch donor data');
                 }
 
-                const data = await response.json();
-                console.log('Donor data after fetch:', data);
-                setDonorInfo(data);
-                setBookings(data); //change this to setBookings(data.bookings)
-                setReviews(data); //change this to setReviews(data.reviews)
+                const profileData = await profileRes.json();
+                const donationsData = await donationsRes.json();
+                const bookingData = await bookingRes.json();
+                const reviewsData = await reviewsRes.json();
+
+                setDonorInfo(profileData);
+                setDonations(donationsData);
+                setBookings(bookingData);
+                setReviews(reviewsData);
             } catch (error) {
                 console.error('Error fetching donor data:', error);
                 alert('Failed to fetch donor data. Please try again later.');
@@ -37,10 +73,27 @@ function DonorDashboard() {
         };
 
         fetchDonorData();
-    }, [navigate]);
+    }, [navigate, donorId]);
 
-    const handleViewDetails = (id) => {
-        navigate(`/booking_details/${id}`);
+    useEffect(() => {
+        const handleResize = () => {
+            setContainerHeight(window.innerHeight - 40);
+        };
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    const handleBookingDetails = (booking_id) => {
+        navigate(`/users/${donorId}/booking_details/${booking_id}`);
+    };
+
+    const handleListingDetails = (listing_id) => {
+        navigate(`/users/${donorId}/listing_details/${listing_id}`);
     };
 
     if (loading) {
@@ -48,83 +101,140 @@ function DonorDashboard() {
     }
 
     return (
-        <div style={styles.dashboardContainer}>
-            <div style={styles.profileSection}>
-                <h3>Donor Profile</h3>
-                <p>{donorInfo?.name || '[Name Not Available]'}</p>
-                <p>{donorInfo?.email || '[Email Not Available]'}</p>
-                <p>Overall Rating:</p>
-                <p>★★★★☆ ({donorInfo?.rating || 'N/A'})</p>
-                <button style={styles.button} onClick={() => navigate('/create_listing')}>
-                    Create New Listing
-                </button>
-            </div>
+        <div>
+            {showAlert && (
+                <div style={styles.alert}>
+                    New listing created!
+                </div>
+            )}
 
-            <div style={styles.bookingsSection}>
-                <h3>Your Donations & Bookings</h3>
-                {bookings.password !== null ? ( //change this to bookings.length > 0
-                    bookings.map((booking) => (
-                        <div key={booking.id} style={styles.bookingRow}>
-                            <p><strong>Donation Item:</strong> {booking.item}</p>
-                            <p><strong>Recipient:</strong> {booking.recipient}</p>
-                            <p><strong>Status:</strong> {booking.status}</p>
-                            <button
-                                style={styles.detailsButton}
-                                onClick={() => handleViewDetails(booking.id)}
-                            >
-                                View Details
-                            </button>
-                        </div>
-                    ))
-                ) : (
-                    <p>No bookings available.</p>
-                )}
-            </div>
+            <div style={{ ...styles.dashboardContainer, height: containerHeight }}>
+                <div style={styles.profileSection}>
+                    <h3 style={{ textAlign: 'center', fontSize: '1.2em', fontWeight: "bold", paddingBottom: '15px' }}>Donor Profile</h3>
+                    <div style={{ textAlign: "center", margin: "20px 0", fontSize: "1.2em" }}>
+                        <p>{donorInfo?.name || '[Name Not Available]'}</p>
+                        <p>{donorInfo?.email || '[Email Not Available]'}</p>
+                        <p>Overall Rating: <StarRating rating={donorInfo?.rating || 0} /> ({donorInfo?.rating || 0})</p>
+                    </div>
 
-            <div style={styles.reviewsSection}>
-                <h3>Reviews from Recipients</h3>
-                {reviews.password !== null ? ( //change this to reviews.length > 0
-                    reviews.map((review) => (
-                        <div key={review.id} style={styles.reviewRow}>
-                            <p><strong>Recipient:</strong> {review.recipient}</p>
-                            <p><strong>Review:</strong> {review.comment} ★★★★★</p>
-                        </div>
-                    ))
-                ) : (
-                    <p>No reviews available.</p>
-                )}
+                    <div style={styles.buttonContainer}>
+                        <button className='w-full bg-green-500 text-white py-3 rounded-md font-semibold hover:bg-blue-600 transition duration-300' onClick={() => navigate(`/users/${donorId}/create_listing`)}>
+                            Create New Listing
+                        </button>
+                    </div>
+                </div>
+
+                <div style={styles.Middlecontainer}>
+                    <div style={styles.donationsSection}>
+                    <style>{`div::-webkit-scrollbar {display: none;}`}</style>
+                        <h3 style={styles.sectionHeading}>My Donations</h3>
+                        {donations.length > 0 ? (
+                            donations.map((donation) => (
+                                <div key={donation.id} style={{ ...styles.bookingRow}}>
+                                    <div style={{ flex: 1 }}>
+                                        <p><strong>Location:</strong> {(donation.location?donation.location:"Not Available")}</p>
+                                        <p><strong>Status:</strong> {donation.status}</p>
+                                    </div>
+
+                                    
+                                    <button
+                                        className='w-1/5 bg-green-500 text-white py-3 rounded-md font-semibold hover:bg-blue-600 transition duration-300'
+                                        onClick={() => handleListingDetails(donation.listingId)}
+                                    >
+                                        View Details
+                                    </button>
+                                </div>
+
+                            ))
+                        ) : (
+                            <p>No Donations available.</p>
+                        )}
+                    </div>
+
+                    <div style={styles.bookingsSection}>
+                        <style>{`div::-webkit-scrollbar {display: none;}`}</style>
+                        <h3 style={styles.sectionHeading}>My Previous Bookings</h3>
+                        {bookings.length > 0 ? (
+                            bookings.map((donation) => (
+                                <div key={donation.id} style={{ ...styles.bookingRow }}>
+                                    <div style={{ flex: 1 }}>
+                                        <p><strong>Booking ID:</strong> <i>{donation.bookingId}</i></p>
+                                        <p><strong>Recipient Name:</strong> {donation.name}</p>
+                                        <p><strong>Booking Status:</strong> {donation.bookingStatus}</p>
+                                    </div>
+                                    {
+                                        (donation.bookingStatus === "CANCELLED")?
+                                            <button
+                                                style={{ ...styles.detailsButton, backgroundColor: '#d3d3d3', cursor: 'not-allowed' }}
+                                                disabled
+                                            >
+                                                Booking Details
+                                            </button>
+                                        : (
+                                            <button
+                                                className='w-1/4 bg-green-500 text-white py-3 rounded-md font-semibold hover:bg-blue-600 transition duration-300'
+                                                onClick={() => handleBookingDetails(donation.bookingId)}
+                                            >
+                                                Booking Details
+                                            </button>
+                                        )
+                                    }
+                                </div>
+                            ))
+                        ) : (
+                            <p>No Bookings available.</p>
+                        )}
+                    </div>
+
+                </div>
+
+                <div style={styles.reviewsSection}>
+                    <h3 style={{ textAlign: 'center', fontSize: '1.2em', fontWeight: "bold", paddingBottom: '15px' }}>Reviews from Recipients</h3>
+                    {reviews.length > 0 ? (
+                        reviews.map((review) => (
+                            <div key={review.id} style={styles.reviewRow}>
+                                <p><strong>Recipient:</strong> {review.recipientName}</p>
+                                <p><strong>Rating:</strong> <StarRating rating={review.rating || 0} /> ({review.rating || 0})</p>
+                                <p><strong>Posted on:</strong> {review.reviewDate}</p>
+                                <div style={styles.reviewContent}>
+                                    <span><strong>Review:</strong></span>
+                                    <p>"{review.review}"</p>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <p>No reviews available.</p>
+                    )}
+                </div>
             </div>
         </div>
     );
 }
+
+
 
 const styles = {
     dashboardContainer: {
         display: 'grid',
         gridTemplateColumns: '1fr 2fr 1fr',
         gap: '20px',
-        backgroundColor: '#fff',
         padding: '20px',
-        borderRadius: '8px',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
         width: '90%',
         margin: '20px auto',
+        maxHeight: 'calc(100vh - 40px)',  
     },
+    
+
     profileSection: {
+        width: '100%',
         backgroundColor: '#fff9c4',
         padding: '15px',
+        marginBottom: '20px',
         borderRadius: '6px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        border: "1px solid lightgrey",
     },
-    bookingsSection: {
-        backgroundColor: '#e0f7fa',
-        padding: '15px',
-        borderRadius: '6px',
-    },
-    reviewsSection: {
-        backgroundColor: '#ffe0b2',
-        padding: '15px',
-        borderRadius: '6px',
-    },
+    
     button: {
         padding: '10px 20px',
         backgroundColor: '#28a745',
@@ -134,20 +244,112 @@ const styles = {
         fontSize: '16px',
         cursor: 'pointer',
     },
-    detailsButton: {
-        padding: '5px 10px',
-        backgroundColor: '#28a745',
-        color: 'white',
-        borderRadius: '4px',
-        border: 'none',
-        fontSize: '14px',
-        cursor: 'pointer',
+
+    buttonContainer: {
+        textAlign: 'center',  
+        marginTop: '20px',    
+    },
+    
+
+    Middlecontainer: {
+        display: "flex",
+        flexDirection: "column", 
+        gap: "20px", 
+        padding: "0 20px 20px 20px", 
+        
+    },
+    donationsSection: {
+        backgroundColor: "#eaf4fc", 
+        padding: "15px",
+        borderRadius: "8px",
+        boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+        maxHeight: "330px", 
+        overflow: "auto", 
+        border: "1px solid lightgrey",
+        
+        overflowY: "scroll",
+        height: "400px", 
+        msOverflowStyle: "none", 
+        scrollbarWidth: "none", 
+    },
+    bookingsSection: {
+        backgroundColor: "#f4f9ea", 
+        padding: "15px",
+        borderRadius: "8px",
+        boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+        maxHeight: "300px", 
+        overflow: "auto", 
+        border: "1px solid lightgrey",
+
+        overflowY: "scroll",
+        height: "250px", 
+        msOverflowStyle: "none", 
+        scrollbarWidth: "none", 
+    },
+    sectionHeading: {
+        textAlign: "center",
+        fontSize: "1.2em",
+        fontWeight: "bold",
+        paddingBottom: "15px",
     },
     bookingRow: {
-        marginBottom: '15px',
+        backgroundColor: "#ffffff",
+        padding: "10px",
+        marginBottom: "10px",
+        borderRadius: "5px",
+        boxShadow: "0 1px 5px rgba(0, 0, 0, 0.1)",
+        
+        display: "flex",
+        justifyContent: "space-between",
+        gap: "20px",
+        alignItems: "center",
     },
+
+    detailsButton: {
+        marginTop: '10px',
+        padding: '10px 15px',
+        backgroundColor: '#28A745',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer',
+    },
+
+    alert: {
+        padding: '10px 20px',
+        backgroundColor: '#d4edda',
+        color: '#155724',
+        borderRadius: '4px',
+        textAlign: 'center',
+        marginBottom: '20px',
+        fontWeight: 'bold',
+    },
+
+
+
+    reviewsSection: {
+        width: '100%',
+        backgroundColor: '#ffe0b2',
+        padding: '15px',
+        marginBottom: '20px',
+        borderRadius: '6px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        overflow: 'auto', 
+        border: "1px solid lightgrey",
+    },
+
+    
     reviewRow: {
-        marginBottom: '15px',
+        marginBottom: '20px',
+        padding: '15px',
+        backgroundColor: '#fff',
+        borderRadius: '8px',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    },
+    reviewContent: {
+        marginTop: '10px',
+        textAlign: 'justify',
+        textJustify: 'inter-word',
     },
 };
 

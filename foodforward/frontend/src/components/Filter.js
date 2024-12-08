@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import donorDashboard from "./DonorDashboard";
 
 const FilterComponent = ({ onApplyFilters, location }) => {
   const [filters, setFilters] = useState({
@@ -8,7 +9,8 @@ const FilterComponent = ({ onApplyFilters, location }) => {
     pickupTimeStart: '',
     pickupTimeEnd: '',
     location: location || '',
-    distance: ''
+    distance: '',
+    recipientId:'60'
   });
 
   useEffect(() => {
@@ -38,10 +40,10 @@ const FilterComponent = ({ onApplyFilters, location }) => {
         <div>
           <label className="block text-gray-700 font-semibold">Food Type</label>
           <select
-            name="foodType"
-            value={filters.foodType}
-            onChange={handleChange}
-            className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              name="foodType"
+              value={filters.foodType}
+              onChange={handleChange}
+              className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
             <option value="">Select Food Type</option>
             <option value="baby food">Baby Food</option>
@@ -61,12 +63,12 @@ const FilterComponent = ({ onApplyFilters, location }) => {
         <div>
           <label className="block text-gray-700 font-semibold">Quantity Needed</label>
           <input
-            type="number"
-            name="quantityNeeded"
-            value={filters.quantityNeeded}
-            onChange={handleChange}
-            placeholder="Enter quantity"
-            className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              type="number"
+              name="quantityNeeded"
+              value={filters.quantityNeeded}
+              onChange={handleChange}
+              placeholder="Enter quantity"
+              className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
 
@@ -74,11 +76,11 @@ const FilterComponent = ({ onApplyFilters, location }) => {
         <div>
           <label className="block text-gray-700 font-semibold">Expiry Date</label>
           <input
-            type="date"
-            name="expiryDate"
-            value={filters.expiryDate}
-            onChange={handleChange}
-            className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              type="date"
+              name="expiryDate"
+              value={filters.expiryDate}
+              onChange={handleChange}
+              className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
 
@@ -86,11 +88,11 @@ const FilterComponent = ({ onApplyFilters, location }) => {
         <div>
           <label className="block text-gray-700 font-semibold">Pickup Time Start</label>
           <input
-            type="time"
-            name="pickupTimeStart"
-            value={filters.pickupTimeStart}
-            onChange={handleChange}
-            className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              type="time"
+              name="pickupTimeStart"
+              value={filters.pickupTimeStart}
+              onChange={handleChange}
+              className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
 
@@ -98,11 +100,11 @@ const FilterComponent = ({ onApplyFilters, location }) => {
         <div>
           <label className="block text-gray-700 font-semibold">Pickup Time End</label>
           <input
-            type="time"
-            name="pickupTimeEnd"
-            value={filters.pickupTimeEnd}
-            onChange={handleChange}
-            className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              type="time"
+              name="pickupTimeEnd"
+              value={filters.pickupTimeEnd}
+              onChange={handleChange}
+              className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
 
@@ -123,19 +125,32 @@ const FilterComponent = ({ onApplyFilters, location }) => {
         <div>
           <label className="block text-gray-700 font-semibold">Distance (in km)</label>
           <input
-            type="number"
-            name="distance"
-            value={filters.distance}
-            onChange={handleChange}
-            placeholder="Enter distance in kilometers"
-            className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              type="number"
+              name="distance"
+              value={filters.distance}
+              onChange={handleChange}
+              placeholder="Enter distance in kilometers"
+              className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
 
+
+        {/*<div>*/}
+        {/*  <label className="block text-gray-700 font-semibold">Recipient ID</label>*/}
+        {/*  <input*/}
+        {/*      type="number"*/}
+        {/*      name="recipientId"*/}
+        {/*      value={filters.recipientId}*/}
+        {/*      onChange={handleChange}*/}
+        {/*      placeholder="Enter the recipient's ID"*/}
+        {/*      className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"*/}
+        {/*  />*/}
+        {/*</div>*/}
+
         {/* Apply Filters Button */}
         <button
-          type="submit"
-          className="w-full bg-emerald-600 text-white font-semibold py-2 rounded-md mt-4 hover:bg-emerald-500 transition"
+            type="submit"
+            className="w-full bg-emerald-600 text-white font-semibold py-2 rounded-md mt-4 hover:bg-emerald-500 transition"
         >
           Apply Filters
         </button>

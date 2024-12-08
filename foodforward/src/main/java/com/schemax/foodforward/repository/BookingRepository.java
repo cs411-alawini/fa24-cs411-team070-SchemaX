@@ -113,6 +113,7 @@ public class BookingRepository {
 	}
 
 
+	@SuppressWarnings("deprecation")
 	public List<Booking> getRecipientBookings(Long recipientId) {
 		String sql = "SELECT b.*, it.item_id, it.item_name, it.category, li.quantity, li.listing_item_id, li.expiration_date, l.listing_id, li.status, l.location, d.donor_id, u.name, u.phone, u.email " +
 				"FROM Booking b " +
@@ -169,6 +170,7 @@ public class BookingRepository {
 
 	}
 
+	@SuppressWarnings("deprecation")
 	public List<Booking> getDonorBookings(Long donorId) {
 		String sql = "SELECT b.*, it.item_id, it.item_name, it.category, l.listed_by, li.quantity, li.listing_item_id, li.expiration_date, li.status, l.listing_id, l.location, u.name, u.phone, u.email " +
 				"FROM Booking b " +

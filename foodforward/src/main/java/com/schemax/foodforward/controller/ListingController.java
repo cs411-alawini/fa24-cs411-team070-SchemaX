@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.schemax.foodforward.dto.CreateListingDTO;
-import com.schemax.foodforward.dto.ListingDTO;
 import com.schemax.foodforward.dto.ListingSearchDTO;
 import com.schemax.foodforward.dto.UpdateListingDTO;
 import com.schemax.foodforward.model.Listing;
@@ -27,7 +26,8 @@ public class ListingController {
 	private ListingService listingService;
 
 	@PostMapping("/search")
-	public List<ListingDTO> searchListings(@RequestBody ListingSearchDTO searchDTO) {
+	public List<com.schemax.foodforward.dto.ListingDTO> searchListings(@RequestBody ListingSearchDTO searchDTO) {
+		System.out.println(searchDTO);
 		return listingService.searchListings(searchDTO);
 	}
 
