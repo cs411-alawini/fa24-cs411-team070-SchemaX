@@ -26,6 +26,8 @@ import com.schemax.foodforward.model.Listing;
 import com.schemax.foodforward.model.ListingItem;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Slf4j
 @Repository
@@ -33,6 +35,9 @@ public class ListingRepository {
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
+
+	@Autowired
+	private PlatformTransactionManager transactionManager;
 
 	public List<Listing> findAllByLatitudeIsNullAndLongitudeIsNull() {
 		String sql = "SELECT * FROM Listing WHERE latitude IS NULL AND longitude IS NULL";
@@ -141,41 +146,52 @@ public class ListingRepository {
 	}
 
 	public Long saveListing(CreateListingDTO listing) {
-		String listingSql = "INSERT INTO Listing(listed_by, location, latitude, longitude, type, pickup_time_range, status) "
-				+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
+		TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 
-		KeyHolder keyHolder = new GeneratedKeyHolder();
-		jdbcTemplate.update(connection -> {
-			PreparedStatement ps = connection.prepareStatement(listingSql, Statement.RETURN_GENERATED_KEYS);
-			ps.setLong(1, listing.getDonorId());
-			ps.setString(2, listing.getLocation());
-			if (listing.getLatitude() != null) {
-				ps.setDouble(3, listing.getLatitude());
-			} else {
-				ps.setNull(3, Types.DOUBLE);
-			}
-			if (listing.getLongitude() != null) {
-				ps.setDouble(4, listing.getLongitude());
-			} else {
-				ps.setNull(4, Types.DOUBLE);
-			}
-			ps.setString(5, listing.getType());
-			ps.setString(6, listing.getPickupTimeRange());
-			ps.setString(7, listing.getStatus());
-			return ps;
-		}, keyHolder);
+		return transactionTemplate.execute(status -> {
+				try {
+					String listingSql = "INSERT INTO Listing(listed_by, location, latitude, longitude, type, pickup_time_range, status) "
+							+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-		Long listingId = keyHolder.getKey().longValue();
+					KeyHolder keyHolder = new GeneratedKeyHolder();
+					jdbcTemplate.update(connection -> {
+						PreparedStatement ps = connection.prepareStatement(listingSql, Statement.RETURN_GENERATED_KEYS);
+						ps.setLong(1, listing.getDonorId());
+						ps.setString(2, listing.getLocation());
+						if (listing.getLatitude() != null) {
+							ps.setDouble(3, listing.getLatitude());
+						} else {
+							ps.setNull(3, Types.DOUBLE);
+						}
+						if (listing.getLongitude() != null) {
+							ps.setDouble(4, listing.getLongitude());
+						} else {
+							ps.setNull(4, Types.DOUBLE);
+						}
+						ps.setString(5, listing.getType());
+						ps.setString(6, listing.getPickupTimeRange());
+						ps.setString(7, listing.getStatus());
+						return ps;
+					}, keyHolder);
 
-		String listingItemSql = "INSERT INTO ListingItem (item_id, listing_id, quantity, expiration_date, status) "
-				+ "VALUES (?, ?, ?, ?, ?)";
+					Long listingId = keyHolder.getKey().longValue();
 
-		for (CreateListingItemDTO item : listing.getListingItems()) {
-			jdbcTemplate.update(listingItemSql, item.getItemId(), listingId, item.getQuantity(),
-					new java.sql.Date(item.getExpirationDate().getTime()), item.getStatus());
-		}
+					String listingItemSql = "INSERT INTO ListingItem (item_id, listing_id, quantity, expiration_date, status) "
+							+ "VALUES (?, ?, ?, ?, ?)";
 
-		return listingId;
+					for (CreateListingItemDTO item : listing.getListingItems()) {
+						jdbcTemplate.update(listingItemSql, item.getItemId(), listingId, item.getQuantity(),
+								new java.sql.Date(item.getExpirationDate().getTime()), item.getStatus());
+					}
+
+					return listingId;
+
+				} catch (Exception e) {
+					status.setRollbackOnly();
+					log.error("Transaction to insert listing Failed : ", e);
+					throw new RuntimeException("Failed to create listing", e);
+				}
+			});
 	}
 
 	@SuppressWarnings("deprecation")
