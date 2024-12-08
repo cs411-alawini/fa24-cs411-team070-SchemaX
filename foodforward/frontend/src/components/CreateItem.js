@@ -105,19 +105,18 @@ const Form = ({ isFormVisible, setIsFormVisible, handleInputChange, handleSubmit
 
                 {/* Quantity */}
                 <div style={styles.formGroup}>
-                    <label style={styles.label}>Quantity (Number or Weight):</label>
+                    <label style={styles.label}>Quantity:</label>
                     <input
                         type="number"
                         name="quantity"
                         value={newItem.quantity}
                         onChange={(e) =>
                             handleInputChange({
-                                target: { name: "quantity", value: parseInt(e.target.value) || 0 },
+                                target: { name: "quantity", value: parseInt(e.target.value) },
                             })
                         }
                         required
                         placeholder="Enter quantity"
-                        min="1"
                         style={styles.input}
                     />
                 </div>

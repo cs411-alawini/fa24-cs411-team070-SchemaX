@@ -101,12 +101,18 @@ const CreateListing = () => {
         },
         body: JSON.stringify(listingData),
     });
-
+    
     if (!response.ok) {
-        alert("Failed to create listing:");
+      const constraintError = await response.text();
+      if (constraintError.includes("chk_valid_quantity")) {
+          alert("Failed to create listing: Quantity constraint violated. Please check the quantity of the items.");
+      }
+      return; 
     }
-  
-    navigate(`/users/${donorId}/donor_dashboard`, { state: { listingCreated: true} });
+    else{
+      navigate(`/users/${donorId}/donor_dashboard`, { state: { listingCreated: true} });
+    }
+    
   };
   
 
