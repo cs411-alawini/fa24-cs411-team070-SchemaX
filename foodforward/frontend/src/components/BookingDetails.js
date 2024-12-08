@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 function BookingDetails() {
-    const { id } = useParams();
+    const { donorId, id } = useParams();
     const navigate = useNavigate();
     const [mainQuery, setMainQuery] = useState([]);
     const [itemSummary, setItemSummary] = useState({});
@@ -114,7 +114,7 @@ function BookingDetails() {
                 </div>
             )}
 
-            <button style={styles.button} onClick={() => navigate('/donor_dashboard')}>
+            <button style={styles.button} onClick={() => navigate(`/users/${donorId}/donor_dashboard`)}>
                 Back to Dashboard
             </button>
         </div>
