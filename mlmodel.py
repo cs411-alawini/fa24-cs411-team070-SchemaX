@@ -3,10 +3,8 @@ from sentence_transformers import SentenceTransformer, util
 
 engine = create_engine("mysql+pymysql://root:schemaXGCP@34.28.150.93:3306/food_donation", isolation_level="AUTOCOMMIT")
 
-# Load pretrained model
 model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
-# Fetch data for all recipients
 def fetch_all_recipient_data():
     query = """
     SELECT 
