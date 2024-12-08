@@ -2,16 +2,15 @@ package com.schemax.foodforward.service.impl;
 
 import java.util.List;
 
-import com.schemax.foodforward.model.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.schemax.foodforward.dto.CreateListingDTO;
-import com.schemax.foodforward.dto.ListingDTO;
 import com.schemax.foodforward.dto.ListingSearchDTO;
 import com.schemax.foodforward.dto.UpdateListingDTO;
+import com.schemax.foodforward.model.Item;
 import com.schemax.foodforward.model.Listing;
 import com.schemax.foodforward.repository.DonorRepository;
 import com.schemax.foodforward.repository.ItemRepository;
@@ -31,8 +30,8 @@ public class ListingServiceImpl implements ListingService {
     private ItemRepository itemRepository;
 
     @Override
-    public List<ListingDTO> searchListings(ListingSearchDTO searchDTO) {
-        List<ListingDTO> listings = listingRepository.findListingsWithFilters(
+    public List<Listing> searchListings(ListingSearchDTO searchDTO) {
+        List<Listing> listings = listingRepository.findListingsWithFilters(
                 searchDTO.getFoodType(),
                 searchDTO.getQuantityNeeded(),
                 searchDTO.getExpiryDate(),

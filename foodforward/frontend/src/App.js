@@ -20,9 +20,7 @@ function App() {
       <Route path="/" element={<Registration />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Registration />} />
-
-        {/* Recipient views */}
-        <Route path="/users/:donorId/recipient_dashboard" element={<RecipientDashboard />} />
+        <Route path="/users/:recipientId/recipient_dashboard" element={<RecipientDashboard />} />
         <Route path="/listings" element={<ViewListings />} />
         <Route path="/listing/:id" element={<ListingDetails />} />
         <Route path="/confirmation" element={<BookingConfirmation />} />
