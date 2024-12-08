@@ -13,6 +13,7 @@ import com.schemax.foodforward.model.Listing;
 
 @Service
 public interface ListingService {
+
 	List<Listing> searchListings(ListingSearchDTO searchDTO);
 	ResponseEntity<String> addListing(CreateListingDTO listing);
 	ResponseEntity<Listing> getListingDetails(Long listingId);

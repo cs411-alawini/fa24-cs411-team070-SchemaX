@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CreateItem from "./CreateItem";
 
-
 const CreateListing = () => {
   const navigate = useNavigate();
   const { donorId } = useParams();
@@ -10,6 +9,7 @@ const CreateListing = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [newItem, setNewItem] = useState({
     itemId: 0,
+
     name: "",
     quantity: 1,
     category: "",
@@ -61,6 +61,7 @@ const CreateListing = () => {
 
   const handleSaveListing = async () => {
 
+
       if (listingItems.length === 0) {
           alert("Please add at least one item to the listing before saving.");
           return;
@@ -77,21 +78,30 @@ const CreateListing = () => {
   
     
     const listingData = {
-      
+
       donorId: donorId,
       location: additionalInputs.pickupLocation,
       pickupTimeRange: `${additionalInputs.pickupStart} - ${additionalInputs.pickupEnd}`,
       status: "AVAILABLE",
       listingItems: listingItems.map(item => ({
-        itemId: item.itemId,
+        quantity: item.quantity,
+        item: {
+          itemName: item.name,
+          category: item.category, 
+        },
         expirationDate: item.expiryDate,
+        itemId: item.itemId,
         quantity: item.quantity,
         status: "AVAILABLE",
       })),
     };
 
+
+    console.log("Listing Data:", listingData);
     
     // ideally we should send this data to the backend/database
+
+
 
     
     const response = await fetch('http://localhost:8080/listings/add', {
@@ -246,6 +256,7 @@ const CreateListing = () => {
         handleSubmit={handleSubmit}
         newItem={newItem}
         setNewItem={setNewItem}
+
         editingIndex={editingIndex} 
       />
 

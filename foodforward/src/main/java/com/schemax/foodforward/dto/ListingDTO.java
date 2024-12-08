@@ -15,6 +15,7 @@ public class ListingDTO {
 	private Date expirationDate;
 	private Long donorId;
 	private String donorName;
+	private Long priority;
 
 	public Long getListingId() {
 		return listingId;
@@ -86,6 +87,14 @@ public class ListingDTO {
 
 	public void setDonorName(String donorName) {
 		this.donorName = donorName;
+	}
+
+	public Long getPriority() {
+		return priority;
+	}
+
+	public void setPriority(Long priority) {
+		this.priority = priority;
 	}
 
 }

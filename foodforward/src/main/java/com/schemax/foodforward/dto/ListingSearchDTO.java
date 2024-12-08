@@ -6,6 +6,7 @@ import lombok.Data;
 
 @Data
 public class ListingSearchDTO {
+	private String recipientId;
 	private String foodType;
 	private Long quantityNeeded;
 	private Date expiryDate;
@@ -15,6 +16,14 @@ public class ListingSearchDTO {
 	private Double distance;
 	private Double userLatitude;
 	private Double userLongitude;
+
+	public String getRecipientId() {
+		return recipientId;
+	}
+
+	public void setRecipientId(String recipientId) {
+		this.recipientId = recipientId;
+	}
 
 	public String getFoodType() {
 		return foodType;
@@ -93,7 +102,7 @@ public class ListingSearchDTO {
 		return "ListingSearchDTO [foodType=" + foodType + ", quantityNeeded=" + quantityNeeded + ", expiryDate="
 				+ expiryDate + ", pickupTimeStart=" + pickupTimeStart + ", pickupTimeEnd=" + pickupTimeEnd
 				+ ", location=" + location + ", distance=" + distance + ", userLatitude=" + userLatitude
-				+ ", userLongitude=" + userLongitude + "]";
+				+ ", userLongitude=" + userLongitude + ", recepientId=" + recipientId + "]";
 	}
 
 }

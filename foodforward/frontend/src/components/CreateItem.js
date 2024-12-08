@@ -20,7 +20,7 @@ const Form = ({ isFormVisible, setIsFormVisible, handleInputChange, handleSubmit
 
     const fetchItems = async () => {
         try {
-            const response = await fetch("http://localhost:8080/listings/items"); // Replace with your API endpoint
+            const response = await fetch("http://localhost:8080/listings/items");
             if (!response.ok) {
                 throw new Error("Failed to fetch items");
             }
@@ -57,7 +57,7 @@ const Form = ({ isFormVisible, setIsFormVisible, handleInputChange, handleSubmit
                 name: selectedItem.itemName,
                 category: selectedItem.category,
             });
-            
+
             setSearchQuery(itemName);
             setFilteredItems([]); // Hide suggestions
         }

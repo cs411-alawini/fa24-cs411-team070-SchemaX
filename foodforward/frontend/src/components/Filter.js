@@ -8,33 +8,37 @@ const FilterComponent = ({ onApplyFilters, location }) => {
     pickupTimeStart: '',
     pickupTimeEnd: '',
     location: location || '',
-    distance: ''
+    distance: '',
+    recipientId: '', 
   });
 
   useEffect(() => {
-    setFilters((prevState) => ({
+
+    const recipientId = localStorage.getItem('recipientId') || '';
       ...prevState,
-      location: location || ''  // Update location if parent provides it
+      recipientId, 
+      location: location || '', 
     }));
   }, [location]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFilters(prevState => ({
+    setFilters((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Applied Filters:', filters);
-    onApplyFilters(filters); // Send filters to parent component
+    onApplyFilters(filters); 
   };
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 shadow-lg rounded-lg max-w-md mx-auto">
       <div className="space-y-3">
+        {/* Food Type */}
         <div>
           <label className="block text-gray-700 font-semibold">Food Type</label>
           <select
@@ -58,6 +62,7 @@ const FilterComponent = ({ onApplyFilters, location }) => {
           </select>
         </div>
 
+        {/* Quantity Needed */}
         <div>
           <label className="block text-gray-700 font-semibold">Quantity Needed</label>
           <input
@@ -105,19 +110,6 @@ const FilterComponent = ({ onApplyFilters, location }) => {
             className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
-
-        {/* Location */}
-        {/* <div>
-          <label className="block text-gray-700 font-semibold">Location</label>
-          <input
-            type="text"
-            name="location"
-            value={filters.location}
-            onChange={handleChange}
-            placeholder="Enter location"
-            className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-        </div> */}
 
         {/* Distance */}
         <div>
