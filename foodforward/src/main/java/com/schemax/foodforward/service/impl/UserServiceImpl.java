@@ -1,11 +1,11 @@
 package com.schemax.foodforward.service.impl;
 
-import com.schemax.foodforward.model.Recipient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.schemax.foodforward.model.Donor;
+import com.schemax.foodforward.model.Recipient;
 import com.schemax.foodforward.model.User;
 import com.schemax.foodforward.repository.DonorRepository;
 import com.schemax.foodforward.repository.UserRepository;
@@ -47,6 +47,24 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User authenticate(String email, String password) {
 		return userRepository.findByEmailAndPassword(email, password);
+	}
+	
+	public void registerUser(User user) throws Exception {
+		Long userId = userRepository.insertUser(user);
+
+		if ("Donor".equalsIgnoreCase(user.getType())) {
+			Donor donor = new Donor();
+			donor.setUserId(userId);
+			donor.setType(user.getType());
+			userRepository.insertDonor(donor);
+		} else if ("Recipient".equalsIgnoreCase(user.getType())) {
+			Recipient recipient = new Recipient();
+			recipient.setUserId(userId);
+			recipient.setNotificationEnabled(((Recipient) user).isNotificationEnabled());
+			userRepository.insertRecipient(recipient);
+		} else {
+			throw new Exception("Invalid user type: " + user.getType());
+		}
 	}
 
 }

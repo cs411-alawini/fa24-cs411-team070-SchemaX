@@ -15,6 +15,8 @@ public class User {
 	private String phone;
 	private String type;
 	private String password;
+	private Long donorId;   
+    private Long recipientId;
 
 	public Long getUserId() {
 		return userId;
@@ -22,6 +24,22 @@ public class User {
 
 	public void setUserId(Long userId) {
 		this.userId = userId;
+	}
+	
+	public Long getDonorId() {
+		return donorId;
+	}
+
+	public void setDonorId(Long donorId) {
+		this.donorId = donorId;
+	}
+	
+	public Long getRecipientId() {
+		return recipientId;
+	}
+
+	public void setRecipientId(Long recipientId) {
+		this.recipientId = recipientId;
 	}
 
 	public String getName() {
@@ -113,4 +131,5 @@ public class User {
 	public User() {
 	}
 
+	
 }

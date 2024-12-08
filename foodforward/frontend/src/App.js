@@ -8,12 +8,15 @@ import BookingConfirmation from './components/BookingConfirmation';
 import RecipientDashboard from './components/RecipientDashboard';
 import DonorDashboard from './components/DonorDashboard';
 import BookingDetails from './components/BookingDetails';
+import Registration from './components/Registration';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
+      <Route path="/" element={<Registration />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Registration />} />
         <Route path="/listings" element={<ViewListings />} />
         <Route path="/listing/:id" element={<ListingDetails />} />
         <Route path="/confirmation" element={<BookingConfirmation />} />
