@@ -2,10 +2,12 @@ package com.schemax.foodforward.model;
 
 import java.util.List;
 
+import com.schemax.foodforward.dto.ListingDTO;
+
 import lombok.ToString;
 
 @ToString
-public class Listing {
+public class Listing extends ListingDTO {
 
 	private Long listingId;
 
@@ -24,6 +26,7 @@ public class Listing {
 	private String status;
 
 	private List<ListingItem> listingItems;
+	private Long priority;
 
 	public Long getListingId() {
 		return listingId;
@@ -31,6 +34,14 @@ public class Listing {
 
 	public void setListingId(Long listingId) {
 		this.listingId = listingId;
+	}
+
+	public Long getPriority() {
+		return priority;
+	}
+
+	public void setPriority(Long priority) {
+		this.priority = priority;
 	}
 
 	public Donor getDonor() {

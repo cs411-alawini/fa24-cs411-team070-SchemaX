@@ -31,8 +31,8 @@ public class ListingServiceImpl implements ListingService {
     private ItemRepository itemRepository;
 
     @Override
-    public List<ListingDTO> searchListings(ListingSearchDTO searchDTO) {
-        List<ListingDTO> listings = listingRepository.findListingsWithFilters(
+    public List<Listing> searchListings(ListingSearchDTO searchDTO) {
+        List<Listing> listings = listingRepository.findListingsWithFilters(
                 searchDTO.getFoodType(),
                 searchDTO.getQuantityNeeded(),
                 searchDTO.getExpiryDate(),

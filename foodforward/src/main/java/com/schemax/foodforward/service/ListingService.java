@@ -14,7 +14,7 @@ import com.schemax.foodforward.model.Listing;
 @Service
 public interface ListingService {
 
-	List<com.schemax.foodforward.dto.ListingDTO> searchListings(ListingSearchDTO searchDTO);
+	List<Listing> searchListings(ListingSearchDTO searchDTO);
 	ResponseEntity<String> addListing(CreateListingDTO listing);
 	ResponseEntity<Listing> getListingDetails(Long listingId);
 	ResponseEntity<List<Listing>> getAllListings(Long donorId);

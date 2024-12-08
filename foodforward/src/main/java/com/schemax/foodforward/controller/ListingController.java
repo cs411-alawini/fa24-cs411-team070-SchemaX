@@ -26,7 +26,7 @@ public class ListingController {
 	private ListingService listingService;
 
 	@PostMapping("/search")
-	public List<com.schemax.foodforward.dto.ListingDTO> searchListings(@RequestBody ListingSearchDTO searchDTO) {
+	public List<Listing> searchListings(@RequestBody ListingSearchDTO searchDTO) {
 		System.out.println(searchDTO);
 		return listingService.searchListings(searchDTO);
 	}
