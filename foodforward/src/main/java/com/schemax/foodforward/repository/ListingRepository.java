@@ -24,6 +24,7 @@ import com.schemax.foodforward.model.Donor;
 import com.schemax.foodforward.model.Item;
 import com.schemax.foodforward.model.Listing;
 import com.schemax.foodforward.model.ListingItem;
+import com.schemax.foodforward.dto.ListingDTO;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -153,7 +154,7 @@ public class ListingRepository {
 
 				});
 
-	    return new ArrayList<>(listingsMap.values());
+//	    return new ArrayList<>(listingsMap.values());
 	}
 
 
