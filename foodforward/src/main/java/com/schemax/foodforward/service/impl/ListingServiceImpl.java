@@ -2,6 +2,7 @@ package com.schemax.foodforward.service.impl;
 
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import com.schemax.foodforward.repository.ItemRepository;
 import com.schemax.foodforward.repository.ListingRepository;
 import com.schemax.foodforward.service.ListingService;
 
+@Slf4j
 @Service
 public class ListingServiceImpl implements ListingService {
 
@@ -117,6 +119,7 @@ public class ListingServiceImpl implements ListingService {
              listingRepository.deleteListing(listingId);
             return ResponseEntity.ok("Listing deleted successfully with ID: " + listingId);
         } catch (Exception e) {
+            log.error("Exception while deleting listing : ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error deleting listing: " + e.getMessage());
         }    }

@@ -514,7 +514,7 @@ public class ListingRepository {
 	public void deleteListing(Long listingId) {
 		String deleteListingQuery = "DELETE FROM Listing where listing_id= " + listingId;
 		String deleteListingItemsQuery = "DELETE FROM ListingItem where listing_id= " + listingId;
-		jdbcTemplate.update(deleteListingQuery);
 		jdbcTemplate.update(deleteListingItemsQuery);
+		jdbcTemplate.update(deleteListingQuery);
 	}
 }
