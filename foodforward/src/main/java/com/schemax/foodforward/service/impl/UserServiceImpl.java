@@ -48,20 +48,12 @@ public class UserServiceImpl implements UserService {
 	public User authenticate(String email, String password) {
 		return userRepository.findByEmailAndPassword(email, password);
 	}
-	
-	public void registerUser(User user) throws Exception {
-		Long userId = userRepository.insertUser(user);
 
+	public void registerUser(User user) throws Exception {
 		if ("Donor".equalsIgnoreCase(user.getType())) {
-			Donor donor = new Donor();
-			donor.setUserId(userId);
-			donor.setType(user.getType());
-			userRepository.insertDonor(donor);
+			userRepository.insertDonor(user);
 		} else if ("Recipient".equalsIgnoreCase(user.getType())) {
-			Recipient recipient = new Recipient();
-			recipient.setUserId(userId);
-			recipient.setNotificationEnabled(((Recipient) user).isNotificationEnabled());
-			userRepository.insertRecipient(recipient);
+			userRepository.insertRecipient(user);
 		} else {
 			throw new Exception("Invalid user type: " + user.getType());
 		}

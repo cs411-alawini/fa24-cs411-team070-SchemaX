@@ -110,4 +110,14 @@ public class ListingServiceImpl implements ListingService {
                     .body("Error adding item: " + e.getMessage());
         }
     }
+
+    @Override
+    public ResponseEntity<String> deleteListing(Long listingId) {
+        try {
+             listingRepository.deleteListing(listingId);
+            return ResponseEntity.ok("Listing deleted successfully with ID: " + listingId);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error deleting listing: " + e.getMessage());
+        }    }
 }

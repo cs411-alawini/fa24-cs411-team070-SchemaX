@@ -21,4 +21,6 @@ public interface ListingService {
 	ResponseEntity<String> updateListing(UpdateListingDTO updateListingDTO);
 	ResponseEntity<List<Item>> getItems(String searchQuery);
 	ResponseEntity<String> saveItem(Item item);
+	ResponseEntity<String> deleteListing(Long listingId);
+
 }

@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,12 +15,18 @@ import org.springframework.stereotype.Repository;
 import com.schemax.foodforward.model.Donor;
 import com.schemax.foodforward.model.Recipient;
 import com.schemax.foodforward.model.User;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
+@Slf4j
 @Repository
 public class UserRepository {
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
+
+	@Autowired
+	private PlatformTransactionManager transactionManager;
 
 	public List<User> findAllByLatitudeIsNullAndLongitudeIsNull() {
 		String sql = "SELECT * FROM User WHERE latitude IS NULL AND longitude IS NULL";
@@ -149,29 +156,94 @@ public class UserRepository {
 		return null;
 	}
 
-	public void insertDonor(Donor donor) {
-		try {
-			String sql = """
-					INSERT INTO Donor (type, user_id)
-					VALUES (?, ?, ?, ?)
+
+	public Long insertDonor(User user) {
+			TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+			return transactionTemplate.execute(status -> {
+				try {
+					String sql = """
+					INSERT INTO User (name, location, email, phone, type, password)
+					VALUES (?, ?, ?, ?, ?, ?)
 					""";
 
-			jdbcTemplate.update(sql, donor.getType(), donor.getUserId());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+					KeyHolder keyHolder = new GeneratedKeyHolder();
+					jdbcTemplate.update(connection -> {
+						PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+						ps.setString(1, user.getName());
+						ps.setString(2, user.getLocation());
+						ps.setString(3, user.getEmail());
+						ps.setString(4, user.getPhone());
+						ps.setString(5, user.getType());
+						ps.setString(6, user.getPassword());
+						return ps;
+					}, keyHolder);
+
+					Long userId =  keyHolder.getKey().longValue();
+
+					String sqlDonor = """
+					INSERT INTO Donor (type, user_id)
+					VALUES (?, ?)
+					""";
+
+					KeyHolder keyHolderDonor = new GeneratedKeyHolder();
+
+					jdbcTemplate.update(con-> {
+						PreparedStatement ps = con.prepareStatement(sqlDonor, Statement.RETURN_GENERATED_KEYS);
+						ps.setString(1, user.getType());
+						ps.setLong(2, userId);
+						return ps;
+					}, keyHolderDonor);
+
+					return keyHolderDonor.getKey().longValue();
+				} catch (Exception e) {
+					log.error("Error creating Donor");
+					throw new RuntimeException("Error creating Donor", e);
+				}
+			});
 	}
 
-	public void insertRecipient(Recipient recipient) {
-		try {
-			String sql = """
-					INSERT INTO Recipient (notification_enabled, user_id)
-					VALUES (?, ?, ?)
+	public Long insertRecipient(User user) {
+		TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+		return transactionTemplate.execute(status -> {
+			try {
+				String sql = """
+					INSERT INTO User (name, location, email, phone, type, password)
+					VALUES (?, ?, ?, ?, ?, ?)
 					""";
 
-			jdbcTemplate.update(sql, recipient.isNotificationEnabled(), recipient.getUserId());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+				KeyHolder keyHolder = new GeneratedKeyHolder();
+				jdbcTemplate.update(connection -> {
+					PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+					ps.setString(1, user.getName());
+					ps.setString(2, user.getLocation());
+					ps.setString(3, user.getEmail());
+					ps.setString(4, user.getPhone());
+					ps.setString(5, user.getType());
+					ps.setString(6, user.getPassword());
+					return ps;
+				}, keyHolder);
+
+				Long userId =  keyHolder.getKey().longValue();
+
+				String sqlRecipient = """
+					INSERT INTO Recipient (notification_enabled, user_id)
+					VALUES (?, ?)
+					""";
+
+				KeyHolder keyHolderRecipient = new GeneratedKeyHolder();
+
+				jdbcTemplate.update(con-> {
+					PreparedStatement ps = con.prepareStatement(sqlRecipient, Statement.RETURN_GENERATED_KEYS);
+					ps.setBoolean(1, ((Recipient) user).isNotificationEnabled());
+					ps.setLong(2, userId);
+					return ps;
+				}, keyHolderRecipient);
+
+				return keyHolderRecipient.getKey().longValue();
+			} catch (Exception e) {
+				log.error("Error creating Recipient");
+				throw new RuntimeException("Error creating Recipient", e);
+			}
+		});
 	}
 }
