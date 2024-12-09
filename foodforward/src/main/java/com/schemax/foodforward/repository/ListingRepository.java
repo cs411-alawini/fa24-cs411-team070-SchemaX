@@ -303,7 +303,7 @@ public class ListingRepository {
 		String sql = "SELECT l.*, u.name AS donor_name, d.preferred_pickup_time, d.type, d.donor_id, l.location as listing_location, u.user_id, u.email, u.phone, u.location as user_location, u.contact_preference, "
 				+ "li.listing_item_id, li.quantity, li.expiration_date AS item_expiration_date, li.status AS item_status, li.booking_id, "
 				+ "i.item_id, i.item_name, i.category " + "FROM Listing l "
-				+ "LEFT JOIN Donor d ON l.listed_by = d.donor_id " + "LEFT JOIN User u ON l.listed_by = u.user_id "
+				+ "LEFT JOIN Donor d ON l.listed_by = d.donor_id " + "LEFT JOIN User u ON d.user_id = u.user_id  "
 				+ "LEFT JOIN ListingItem li ON l.listing_id = li.listing_id "
 				+ "LEFT JOIN Item i ON li.item_id = i.item_id " + "WHERE l.listing_id = ?";
 
