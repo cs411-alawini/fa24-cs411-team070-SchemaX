@@ -16,6 +16,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.schemax.foodforward.dto.CreateListingDTO;
 import com.schemax.foodforward.dto.CreateListingItemDTO;
@@ -24,11 +26,8 @@ import com.schemax.foodforward.model.Donor;
 import com.schemax.foodforward.model.Item;
 import com.schemax.foodforward.model.Listing;
 import com.schemax.foodforward.model.ListingItem;
-import com.schemax.foodforward.dto.ListingDTO;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
 
 @Slf4j
 @Repository
@@ -51,197 +50,252 @@ public class ListingRepository {
 		});
 	}
 
+//	@SuppressWarnings("deprecation")
+//	public List<Listing> findListingsWithFilters(String foodType, Long quantityNeeded, Date expiryDate,
+//			String pickupTimeStart, String pickupTimeEnd, String location, Double distance, Double userLongitude,
+//			Double userLatitude, String recipientId) {
+//
+//		String sql = """
+//	            SELECT
+//				    l.listing_id AS listingId,
+//				    l.location AS location,
+//				    l.pickup_time_range AS pickupTimeRange,
+//				    l.status AS listingStatus,
+//				    li.listing_item_id AS listingItemId,
+//				    li.quantity AS quantity,
+//				    li.expiration_date AS itemExpirationDate,
+//				    li.status AS itemStatus,
+//				    i.item_id AS itemId,
+//				    i.item_name AS itemName,
+//				    i.category AS category,
+//				    d.donor_id AS donorId,
+//				    u.name AS donorName,
+//				    u.email AS donorEmail,
+//				    u.phone AS donorPhone,
+//				    1 AS priority -- Recommendations have higher priority
+//				FROM Listing l
+//				JOIN ListingItem li ON l.listing_id = li.listing_id
+//				JOIN Item i ON li.item_id = i.item_id
+//				JOIN Donor d ON l.listed_by = d.donor_id
+//				JOIN User u ON d.user_id = u.user_id
+//				JOIN Recommendation r ON r.donor_id = d.donor_id AND r.recipient_id = ?
+//				WHERE
+//				    (? IS NULL OR i.category = ?)
+//				    AND (? IS NULL OR li.quantity >= ?)
+//				    AND (? IS NULL OR li.expiration_date <= ?)
+//				    AND (? IS NULL OR l.pickup_time_range >= ?)
+//				    AND (? IS NULL OR l.pickup_time_range <= ?)
+//				    AND (? IS NULL OR l.location LIKE CONCAT('%', ?, '%'))
+//				    AND (? IS NULL OR (
+//				        ? IS NOT NULL AND
+//				        ? IS NOT NULL AND
+//				        ST_Distance_Sphere(POINT(l.longitude, l.latitude), POINT(?, ?)) <= ?))
+//				    AND l.status = 'ACTIVE'
+//				    AND li.status = 'AVAILABLE'
+//				    AND (li.expiration_date IS NULL OR li.expiration_date > CURRENT_DATE)
+//
+//				UNION ALL
+//
+//				SELECT
+//				    l.listing_id AS listingId,
+//				    l.location AS location,
+//				    l.pickup_time_range AS pickupTimeRange,
+//				    l.status AS listingStatus,
+//				    li.listing_item_id AS listingItemId,
+//				    li.quantity AS quantity,
+//				    li.expiration_date AS itemExpirationDate,
+//				    li.status AS itemStatus,
+//				    i.item_id AS itemId,
+//				    i.item_name AS itemName,
+//				    i.category AS category,
+//				    d.donor_id AS donorId,
+//				    u.name AS donorName,
+//				    u.email AS donorEmail,
+//				    u.phone AS donorPhone,
+//				    2 AS priority -- Regular listings have lower priority
+//				FROM Listing l
+//				JOIN ListingItem li ON l.listing_id = li.listing_id
+//				JOIN Item i ON li.item_id = i.item_id
+//				JOIN Donor d ON l.listed_by = d.donor_id
+//				JOIN User u ON d.user_id = u.user_id
+//				WHERE
+//				    (? IS NULL OR i.category = ?)
+//				    AND (? IS NULL OR li.quantity >= ?)
+//				    AND (? IS NULL OR li.expiration_date <= ?)
+//				    AND (? IS NULL OR l.pickup_time_range >= ?)
+//				    AND (? IS NULL OR l.pickup_time_range <= ?)
+//				    AND (? IS NULL OR l.location LIKE CONCAT('%', ?, '%'))
+//				    AND (? IS NULL OR (
+//				        ? IS NOT NULL AND
+//				        ? IS NOT NULL AND
+//				        ST_Distance_Sphere(POINT(l.longitude, l.latitude), POINT(?, ?)) <= ?))
+//				    AND l.status = 'ACTIVE'
+//				    AND li.status = 'AVAILABLE'
+//				    AND (li.expiration_date IS NULL OR li.expiration_date > CURRENT_DATE)
+//
+//				ORDER BY 9,1;
+//				        """;
+//
+//		Map<Long, Listing> listingsMap = new HashMap<>();
+//
+//		jdbcTemplate.query(sql, new Object[] { Integer.parseInt(recipientId), // For Recommendation query
+//				foodType, foodType, quantityNeeded, quantityNeeded, expiryDate, expiryDate, pickupTimeStart,
+//				pickupTimeStart, pickupTimeEnd, pickupTimeEnd, location, location, distance, userLatitude,
+//				userLongitude, userLongitude, userLatitude, distance, foodType, foodType, quantityNeeded,
+//				quantityNeeded, expiryDate, expiryDate, pickupTimeStart, pickupTimeStart, pickupTimeEnd, pickupTimeEnd,
+//				location, location, distance, userLatitude, userLongitude, userLongitude, userLatitude, distance },
+//				(rs) -> {
+//					Long listingId = rs.getLong("listingId");
+//					Listing listing = listingsMap.computeIfAbsent(listingId, id -> {
+//						try {
+//							Listing l = new Listing();
+//							l.setListingId(id);
+//							l.setLocation(rs.getString("location"));
+//							l.setPickupTimeRange(rs.getString("pickupTimeRange"));
+//							l.setStatus(rs.getString("listingStatus"));
+//							l.setPriority(rs.getLong("priority"));
+//
+//							Donor donor = new Donor();
+//							donor.setDonorId(rs.getLong("donorId"));
+//							donor.setName(rs.getString("donorName"));
+//							donor.setEmail(rs.getString("donorEmail"));
+//							donor.setPhone(rs.getString("donorPhone"));
+//
+//							l.setDonor(donor);
+//							l.setListingItems(new ArrayList<>());
+//
+//							return l;
+//						} catch (SQLException e) {
+//							throw new RuntimeException(e);
+//						}
+//					});
+//
+//					Long listingItemId = rs.getLong("listingItemId");
+//					if (listingItemId != 0) {
+//						ListingItem listingItem = new ListingItem();
+//						listingItem.setListingItemId(listingItemId);
+//						listingItem.setQuantity(rs.getLong("quantity"));
+//						listingItem.setExpirationDate(rs.getDate("itemExpirationDate"));
+//						listingItem.setStatus(rs.getString("itemStatus"));
+//
+//						Item itemDetails = new Item();
+//						itemDetails.setItemId(rs.getLong("itemId"));
+//						itemDetails.setItemName(rs.getString("itemName"));
+//						itemDetails.setCategory(rs.getString("category"));
+//
+//						listingItem.setItem(itemDetails);
+//						listing.getListingItems().add(listingItem);
+//					}
+//				});
+//
+//		return new ArrayList<>(listingsMap.values());
+//	}
+	
 	@SuppressWarnings("deprecation")
 	public List<Listing> findListingsWithFilters(String foodType, Long quantityNeeded, Date expiryDate,
-                                             String pickupTimeStart, String pickupTimeEnd, String location,
-                                             Double distance, Double userLongitude, Double userLatitude, String recipientId) {
+			String pickupTimeStart, String pickupTimeEnd, String location, Double distance, Double userLongitude,
+			Double userLatitude, String recipientId) {
 
-    String sql = """
-            SELECT
-    l.listing_id AS listingId,
-    l.location AS location,
-    l.pickup_time_range AS pickupTimeRange,
-    l.status AS listingStatus,
-    li.listing_item_id AS listingItemId,
-    li.quantity AS quantity,
-    li.expiration_date AS itemExpirationDate,
-    li.status AS itemStatus,
-    i.item_id AS itemId,
-    i.item_name AS itemName,
-    i.category AS category,
-    d.donor_id AS donorId,
-    u.name AS donorName,
-    u.email AS donorEmail,
-    u.phone AS donorPhone,
-    1 AS priority -- Recommendations have higher priority
-FROM Listing l
-JOIN ListingItem li ON l.listing_id = li.listing_id
-JOIN Item i ON li.item_id = i.item_id
-JOIN Donor d ON l.listed_by = d.donor_id
-JOIN User u ON d.user_id = u.user_id
-JOIN Recommendation r ON r.donor_id = d.donor_id AND r.recipient_id = ?
-WHERE
-    (? IS NULL OR i.category = ?)
-    AND (? IS NULL OR li.quantity >= ?)
-    AND (? IS NULL OR li.expiration_date <= ?)
-    AND (? IS NULL OR l.pickup_time_range >= ?)
-    AND (? IS NULL OR l.pickup_time_range <= ?)
-    AND (? IS NULL OR l.location LIKE CONCAT('%', ?, '%'))
-    AND (? IS NULL OR (
-        ? IS NOT NULL AND
-        ? IS NOT NULL AND
-        ST_Distance_Sphere(POINT(l.longitude, l.latitude), POINT(?, ?)) <= ?))
-    AND l.status = 'ACTIVE'
-    AND li.status = 'AVAILABLE'
-    AND (li.expiration_date IS NULL OR li.expiration_date > CURRENT_DATE)
-
-UNION ALL
-
-SELECT
-    l.listing_id AS listingId,
-    l.location AS location,
-    l.pickup_time_range AS pickupTimeRange,
-    l.status AS listingStatus,
-    li.listing_item_id AS listingItemId,
-    li.quantity AS quantity,
-    li.expiration_date AS itemExpirationDate,
-    li.status AS itemStatus,
-    i.item_id AS itemId,
-    i.item_name AS itemName,
-    i.category AS category,
-    d.donor_id AS donorId,
-    u.name AS donorName,
-    u.email AS donorEmail,
-    u.phone AS donorPhone,
-    2 AS priority -- Regular listings have lower priority
-FROM Listing l
-JOIN ListingItem li ON l.listing_id = li.listing_id
-JOIN Item i ON li.item_id = i.item_id
-JOIN Donor d ON l.listed_by = d.donor_id
-JOIN User u ON d.user_id = u.user_id
-WHERE
-    (? IS NULL OR i.category = ?)
-    AND (? IS NULL OR li.quantity >= ?)
-    AND (? IS NULL OR li.expiration_date <= ?)
-    AND (? IS NULL OR l.pickup_time_range >= ?)
-    AND (? IS NULL OR l.pickup_time_range <= ?)
-    AND (? IS NULL OR l.location LIKE CONCAT('%', ?, '%'))
-    AND (? IS NULL OR (
-        ? IS NOT NULL AND
-        ? IS NOT NULL AND
-        ST_Distance_Sphere(POINT(l.longitude, l.latitude), POINT(?, ?)) <= ?))
-    AND l.status = 'ACTIVE'
-    AND li.status = 'AVAILABLE'
-    AND (li.expiration_date IS NULL OR li.expiration_date > CURRENT_DATE)
-
-ORDER BY 9,1;
-        """;
+		String procedureCall = "{CALL FindListingsWithFilters(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
 
 		Map<Long, Listing> listingsMap = new HashMap<>();
 
-		jdbcTemplate.query(sql, new Object[]{
-				Integer.parseInt(recipientId),  // For Recommendation query
-				foodType, foodType, quantityNeeded, quantityNeeded, expiryDate, expiryDate,
-				pickupTimeStart, pickupTimeStart, pickupTimeEnd, pickupTimeEnd, location, location,
-				distance, userLatitude, userLongitude, userLongitude, userLatitude, distance,
-				foodType, foodType, quantityNeeded, quantityNeeded, expiryDate, expiryDate,
-				pickupTimeStart, pickupTimeStart, pickupTimeEnd, pickupTimeEnd, location, location,
-				distance, userLatitude, userLongitude, userLongitude, userLatitude, distance
-		}, (rs) -> {
-			Long listingId = rs.getLong("listingId");
-			Listing listing = listingsMap.computeIfAbsent(listingId, id -> {
-				try {
-					Listing l = new Listing();
-					l.setListingId(id);
-					l.setLocation(rs.getString("location"));
-					l.setPickupTimeRange(rs.getString("pickupTimeRange"));
-					l.setStatus(rs.getString("listingStatus"));
-					l.setPriority(rs.getLong("priority")); 
-		
-					Donor donor = new Donor();
-					donor.setDonorId(rs.getLong("donorId"));
-					donor.setName(rs.getString("donorName"));
-					donor.setEmail(rs.getString("donorEmail"));
-					donor.setPhone(rs.getString("donorPhone"));
-		
-					l.setDonor(donor);
-					l.setListingItems(new ArrayList<>());
-		
-					return l;
-				} catch (SQLException e) {
-					throw new RuntimeException(e);
-				}
-			});
-		
-			Long listingItemId = rs.getLong("listingItemId");
-			if (listingItemId != 0) {
-				ListingItem listingItem = new ListingItem();
-				listingItem.setListingItemId(listingItemId);
-				listingItem.setQuantity(rs.getLong("quantity"));
-				listingItem.setExpirationDate(rs.getDate("itemExpirationDate"));
-				listingItem.setStatus(rs.getString("itemStatus"));
-		
-				Item itemDetails = new Item();
-				itemDetails.setItemId(rs.getLong("itemId"));
-				itemDetails.setItemName(rs.getString("itemName"));
-				itemDetails.setCategory(rs.getString("category"));
-		
-				listingItem.setItem(itemDetails);
-				listing.getListingItems().add(listingItem);
-			}
-		});
-		
-		return new ArrayList<>(listingsMap.values());
-}
+		jdbcTemplate.query(procedureCall, new Object[] { Integer.parseInt(recipientId), 
+				foodType, quantityNeeded, expiryDate, pickupTimeStart, pickupTimeEnd, location, distance, userLongitude,
+				userLatitude }, (rs) -> {
+					Long listingId = rs.getLong("listingId");
+					Listing listing = listingsMap.computeIfAbsent(listingId, id -> {
+						try {
+							Listing l = new Listing();
+							l.setListingId(id);
+							l.setLocation(rs.getString("location"));
+							l.setPickupTimeRange(rs.getString("pickupTimeRange"));
+							l.setStatus(rs.getString("listingStatus"));
+							l.setPriority(rs.getLong("priority"));
 
+							Donor donor = new Donor();
+							donor.setDonorId(rs.getLong("donorId"));
+							donor.setName(rs.getString("donorName"));
+							donor.setEmail(rs.getString("donorEmail"));
+							donor.setPhone(rs.getString("donorPhone"));
+
+							l.setDonor(donor);
+							l.setListingItems(new ArrayList<>());
+
+							return l;
+						} catch (SQLException e) {
+							throw new RuntimeException(e);
+						}
+					});
+
+					Long listingItemId = rs.getLong("listingItemId");
+					if (listingItemId != 0) {
+						ListingItem listingItem = new ListingItem();
+						listingItem.setListingItemId(listingItemId);
+						listingItem.setQuantity(rs.getLong("quantity"));
+						listingItem.setExpirationDate(rs.getDate("itemExpirationDate"));
+						listingItem.setStatus(rs.getString("itemStatus"));
+
+						Item itemDetails = new Item();
+						itemDetails.setItemId(rs.getLong("itemId"));
+						itemDetails.setItemName(rs.getString("itemName"));
+						itemDetails.setCategory(rs.getString("category"));
+
+						listingItem.setItem(itemDetails);
+						listing.getListingItems().add(listingItem);
+					}
+				});
+
+		return new ArrayList<>(listingsMap.values());
+	}
 
 	public Long saveListing(CreateListingDTO listing) {
 		TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 
 		return transactionTemplate.execute(status -> {
-				try {
-					String listingSql = "INSERT INTO Listing(listed_by, location, latitude, longitude, type, pickup_time_range, status) "
-							+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
+			try {
+				String listingSql = "INSERT INTO Listing(listed_by, location, latitude, longitude, type, pickup_time_range, status) "
+						+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-					KeyHolder keyHolder = new GeneratedKeyHolder();
-					jdbcTemplate.update(connection -> {
-						PreparedStatement ps = connection.prepareStatement(listingSql, Statement.RETURN_GENERATED_KEYS);
-						ps.setLong(1, listing.getDonorId());
-						ps.setString(2, listing.getLocation());
-						if (listing.getLatitude() != null) {
-							ps.setDouble(3, listing.getLatitude());
-						} else {
-							ps.setNull(3, Types.DOUBLE);
-						}
-						if (listing.getLongitude() != null) {
-							ps.setDouble(4, listing.getLongitude());
-						} else {
-							ps.setNull(4, Types.DOUBLE);
-						}
-						ps.setString(5, listing.getType());
-						ps.setString(6, listing.getPickupTimeRange());
-						ps.setString(7, listing.getStatus());
-						return ps;
-					}, keyHolder);
-
-					Long listingId = keyHolder.getKey().longValue();
-
-					String listingItemSql = "INSERT INTO ListingItem (item_id, listing_id, quantity, expiration_date, status) "
-							+ "VALUES (?, ?, ?, ?, ?)";
-
-					for (CreateListingItemDTO item : listing.getListingItems()) {
-						jdbcTemplate.update(listingItemSql, item.getItemId(), listingId, item.getQuantity(),
-								new java.sql.Date(item.getExpirationDate().getTime()), item.getStatus());
+				KeyHolder keyHolder = new GeneratedKeyHolder();
+				jdbcTemplate.update(connection -> {
+					PreparedStatement ps = connection.prepareStatement(listingSql, Statement.RETURN_GENERATED_KEYS);
+					ps.setLong(1, listing.getDonorId());
+					ps.setString(2, listing.getLocation());
+					if (listing.getLatitude() != null) {
+						ps.setDouble(3, listing.getLatitude());
+					} else {
+						ps.setNull(3, Types.DOUBLE);
 					}
+					if (listing.getLongitude() != null) {
+						ps.setDouble(4, listing.getLongitude());
+					} else {
+						ps.setNull(4, Types.DOUBLE);
+					}
+					ps.setString(5, listing.getType());
+					ps.setString(6, listing.getPickupTimeRange());
+					ps.setString(7, listing.getStatus());
+					return ps;
+				}, keyHolder);
 
-					return listingId;
+				Long listingId = keyHolder.getKey().longValue();
 
-				} catch (Exception e) {
-					status.setRollbackOnly();
-					log.error("Transaction to insert listing Failed : ", e);
-					throw new RuntimeException("Failed to create listing", e);
+				String listingItemSql = "INSERT INTO ListingItem (item_id, listing_id, quantity, expiration_date, status) "
+						+ "VALUES (?, ?, ?, ?, ?)";
+
+				for (CreateListingItemDTO item : listing.getListingItems()) {
+					jdbcTemplate.update(listingItemSql, item.getItemId(), listingId, item.getQuantity(),
+							new java.sql.Date(item.getExpirationDate().getTime()), item.getStatus());
 				}
-			});
+
+				return listingId;
+
+			} catch (Exception e) {
+				status.setRollbackOnly();
+				log.error("Transaction to insert listing Failed : ", e);
+				throw new RuntimeException("Failed to create listing", e);
+			}
+		});
 	}
 
 	@SuppressWarnings("deprecation")
@@ -424,8 +478,7 @@ ORDER BY 9,1;
 	}
 
 	public Long saveItem(Item item) {
-		String itemSql = "INSERT INTO Item(item_name, category) "
-				+ "VALUES (?, ?)";
+		String itemSql = "INSERT INTO Item(item_name, category) " + "VALUES (?, ?)";
 
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		jdbcTemplate.update(connection -> {
@@ -442,10 +495,10 @@ ORDER BY 9,1;
 	public List<Item> getItems(String searchQuery) {
 		String sql = "SELECT * from Item ";
 
-		if(Objects.nonNull(searchQuery) && !searchQuery.isEmpty()) {
-			sql += "WHERE CONCAT(item_name, category) LIKE '%" + searchQuery +"%'";
+		if (Objects.nonNull(searchQuery) && !searchQuery.isEmpty()) {
+			sql += "WHERE CONCAT(item_name, category) LIKE '%" + searchQuery + "%'";
 		}
-		log.info("Finding All Items query : {}" , sql);
+		log.info("Finding All Items query : {}", sql);
 
 		List<Item> items = jdbcTemplate.query(sql, (rs, rowNum) -> {
 			Item item = new Item();

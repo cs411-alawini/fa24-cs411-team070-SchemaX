@@ -13,7 +13,6 @@ const FilterComponent = ({ onApplyFilters, location }) => {
   });
 
   useEffect(() => {
-
     const recipientId = localStorage.getItem('recipientId') || '';
     setFilters((prevState) => ({
       ...prevState,

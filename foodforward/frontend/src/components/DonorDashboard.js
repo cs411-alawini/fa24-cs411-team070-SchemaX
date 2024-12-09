@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+
 
 function StarRating({ rating, maxStars = 5 }) {
     const stars = [];
@@ -23,9 +26,6 @@ function DonorDashboard() {
     const [showAlert, setShowAlert] = useState(false);
     const [containerHeight, setContainerHeight] = useState('auto');
 
-    
-
-
     useEffect(() => {
         if (location.state?.listingCreated) {
             setShowAlert(true);
@@ -39,7 +39,7 @@ function DonorDashboard() {
     useEffect(() => {
         const fetchDonorData = async () => {
             if (!donorId) {
-                navigate('/login'); 
+                navigate('/login');
                 return;
             }
 
@@ -96,6 +96,25 @@ function DonorDashboard() {
         navigate(`/users/${donorId}/listing_details/${listing_id}`);
     };
 
+    const handleDeleteListing = async (listingId) => {
+        if (window.confirm("Are you sure you want to delete this listing?")) {
+            try {
+                const response = await fetch(`http://localhost:8080/listings/delete/${listingId}`, {
+                    method: 'DELETE',
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to delete the listing');
+                }
+                alert("Listing deleted successfully");
+                setDonations(donations.filter((donation) => donation.listingId !== listingId));
+            } catch (error) {
+                console.error("Error deleting listing:", error);
+                alert("Failed to delete the listing. Please try again.");
+            }
+        }
+    };
+
+
     if (loading) {
         return <p>Loading...</p>;
     }
@@ -126,25 +145,29 @@ function DonorDashboard() {
 
                 <div style={styles.Middlecontainer}>
                     <div style={styles.donationsSection}>
-                    <style>{`div::-webkit-scrollbar {display: none;}`}</style>
+                        <style>{`div::-webkit-scrollbar {display: none;}`}</style>
                         <h3 style={styles.sectionHeading}>My Donations</h3>
                         {donations.length > 0 ? (
                             donations.map((donation) => (
-                                <div key={donation.id} style={{ ...styles.bookingRow}}>
+                                <div key={donation.id} style={{ ...styles.bookingRow }}>
                                     <div style={{ flex: 1 }}>
-                                        <p><strong>Location:</strong> {(donation.location?donation.location:"Not Available")}</p>
+                                        <p><strong>Location:</strong> {donation.location || "Not Available"}</p>
                                         <p><strong>Status:</strong> {donation.status}</p>
                                     </div>
-
-                                    
-                                    <button
-                                        className='w-1/5 bg-green-500 text-white py-3 rounded-md font-semibold hover:bg-blue-600 transition duration-300'
-                                        onClick={() => handleListingDetails(donation.listingId)}
-                                    >
-                                        View Details
-                                    </button>
+                                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                                        <button
+                                            style={styles.detailsButton}
+                                            onClick={() => handleListingDetails(donation.listingId)}
+                                        >
+                                            View Details
+                                        </button>
+                                        <FontAwesomeIcon
+                                            icon={faTrash}
+                                            style={styles.deleteIcon}
+                                            onClick={() => handleDeleteListing(donation.listingId)}
+                                        />
+                                    </div>
                                 </div>
-
                             ))
                         ) : (
                             <p>No Donations available.</p>
@@ -163,21 +186,21 @@ function DonorDashboard() {
                                         <p><strong>Booking Status:</strong> {donation.bookingStatus}</p>
                                     </div>
                                     {
-                                        (donation.bookingStatus === "CANCELLED")?
+                                        (donation.bookingStatus === "CANCELLED") ?
                                             <button
                                                 style={{ ...styles.detailsButton, backgroundColor: '#d3d3d3', cursor: 'not-allowed' }}
                                                 disabled
                                             >
                                                 Booking Details
                                             </button>
-                                        : (
-                                            <button
-                                                className='w-1/4 bg-green-500 text-white py-3 rounded-md font-semibold hover:bg-blue-600 transition duration-300'
-                                                onClick={() => handleBookingDetails(donation.bookingId)}
-                                            >
-                                                Booking Details
-                                            </button>
-                                        )
+                                            : (
+                                                <button
+                                                    className='w-1/4 bg-green-500 text-white py-3 rounded-md font-semibold hover:bg-blue-600 transition duration-300'
+                                                    onClick={() => handleBookingDetails(donation.bookingId)}
+                                                >
+                                                    Booking Details
+                                                </button>
+                                            )
                                     }
                                 </div>
                             ))
@@ -211,8 +234,6 @@ function DonorDashboard() {
     );
 }
 
-
-
 const styles = {
     dashboardContainer: {
         display: 'grid',
@@ -221,76 +242,50 @@ const styles = {
         padding: '20px',
         width: '90%',
         margin: '20px auto',
-        maxHeight: 'calc(100vh - 40px)',  
+        maxHeight: 'calc(100vh - 40px)',
+        boxSizing: 'border-box',
     },
-    
-
     profileSection: {
-        width: '100%',
         backgroundColor: '#fff9c4',
-        padding: '15px',
-        marginBottom: '20px',
-        borderRadius: '6px',
+        padding: '20px',
+        borderRadius: '8px',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
         border: "1px solid lightgrey",
+        height: '100%',
     },
-    
-    button: {
-        padding: '10px 20px',
-        backgroundColor: '#28a745',
-        color: 'white',
-        borderRadius: '4px',
-        border: 'none',
-        fontSize: '16px',
-        cursor: 'pointer',
-    },
-
     buttonContainer: {
-        textAlign: 'center',  
-        marginTop: '20px',    
+        textAlign: 'center',
+        marginTop: '20px',
     },
-    
-
     Middlecontainer: {
         display: "flex",
-        flexDirection: "column", 
-        gap: "20px", 
-        padding: "0 20px 20px 20px", 
-        
+        flexDirection: "column",
+        gap: "20px",
+        padding: "0",
     },
     donationsSection: {
-        backgroundColor: "#eaf4fc", 
-        padding: "15px",
+        backgroundColor: "#eaf4fc",
+        padding: "20px",
         borderRadius: "8px",
         boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-        maxHeight: "330px", 
-        overflow: "auto", 
+        overflowY: "auto",
+        height: "400px",
         border: "1px solid lightgrey",
-        
-        overflowY: "scroll",
-        height: "400px", 
-        msOverflowStyle: "none", 
-        scrollbarWidth: "none", 
     },
     bookingsSection: {
-        backgroundColor: "#f4f9ea", 
-        padding: "15px",
+        backgroundColor: "#f4f9ea",
+        padding: "20px",
         borderRadius: "8px",
         boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-        maxHeight: "300px", 
-        overflow: "auto", 
+        overflowY: "auto",
+        height: "400px",
         border: "1px solid lightgrey",
-
-        overflowY: "scroll",
-        height: "250px", 
-        msOverflowStyle: "none", 
-        scrollbarWidth: "none", 
     },
     sectionHeading: {
         textAlign: "center",
-        fontSize: "1.2em",
+        fontSize: "1.5em",
         fontWeight: "bold",
-        paddingBottom: "15px",
+        marginBottom: "15px",
     },
     bookingRow: {
         backgroundColor: "#ffffff",
@@ -298,59 +293,37 @@ const styles = {
         marginBottom: "10px",
         borderRadius: "5px",
         boxShadow: "0 1px 5px rgba(0, 0, 0, 0.1)",
-        
         display: "flex",
         justifyContent: "space-between",
         gap: "20px",
         alignItems: "center",
     },
-
     detailsButton: {
-        marginTop: '10px',
-        padding: '10px 15px',
+        padding: '8px 12px',
+        fontSize: '14px',
         backgroundColor: '#28A745',
         color: '#fff',
         border: 'none',
         borderRadius: '4px',
         cursor: 'pointer',
     },
-
-    alert: {
-        padding: '10px 20px',
-        backgroundColor: '#d4edda',
-        color: '#155724',
-        borderRadius: '4px',
-        textAlign: 'center',
-        marginBottom: '20px',
-        fontWeight: 'bold',
+    deleteIcon: {
+        color: 'red',
+        cursor: 'pointer',
+        fontSize: '18px',
     },
-
-
-
     reviewsSection: {
-        width: '100%',
         backgroundColor: '#ffe0b2',
-        padding: '15px',
-        marginBottom: '20px',
-        borderRadius: '6px',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        overflow: 'auto', 
-        border: "1px solid lightgrey",
-    },
-
-    
-    reviewRow: {
-        marginBottom: '20px',
-        padding: '15px',
-        backgroundColor: '#fff',
+        padding: '20px',
         borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+        overflowY: 'auto',
+        height: '400px',
+        border: "1px solid lightgrey"
     },
-    reviewContent: {
-        marginTop: '10px',
-        textAlign: 'justify',
-        textJustify: 'inter-word',
-    },
+    reviewRow: {
+        marginBottom: '15 px'
+    }
 };
 
 export default DonorDashboard;
