@@ -1,22 +1,38 @@
 package com.schemax.foodforward.model;
-import jakarta.persistence.*;
+
 import lombok.Data;
 
-@Entity
 @Data
-public class Recipient {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "recipient_id")
-    private Long recipientId;
+public class Recipient extends User {
 
-    @Column(name = "preferences", length = 2048)
-    private String preferences;
+	private Long recipientId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "FK_recipient_user"))
-    private User user;
+	private String preferences;
 
-    @Column(name = "notification_enabled")
-    private Boolean notificationEnabled;
+	private boolean notificationEnabled;
+
+	public Long getRecipientId() {
+		return recipientId;
+	}
+
+	public void setRecipientId(Long recipientId) {
+		this.recipientId = recipientId;
+	}
+
+	public String getPreferences() {
+		return preferences;
+	}
+
+	public void setPreferences(String preferences) {
+		this.preferences = preferences;
+	}
+
+	public boolean isNotificationEnabled() {
+		return notificationEnabled;
+	}
+
+	public void setNotificationEnabled(boolean notificationEnabled) {
+		this.notificationEnabled = notificationEnabled;
+	}
+
 }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.schemax.foodforward.dto.UpdateListingDTO;
 import com.schemax.foodforward.model.Listing;
 import com.schemax.foodforward.model.User;
 import com.schemax.foodforward.repository.ListingRepository;
@@ -23,11 +24,10 @@ public class LocationServiceImpl implements LocationService {
 	@Autowired
 	private UserRepository userRepository;
 
-	private final String apiKey = "AIzaSyC5v1erJPoEpLYQVgwuzoeBOOi5ZCH6c_Q";
+	private final String apiKey = System.getenv("google.maps.api");
 
 	public void updateListingsWithCoordinates() {
 		List<Listing> listingsWithoutCoordinates = listingRepository.findAllByLatitudeIsNullAndLongitudeIsNull();
-
 		RestTemplate restTemplate = new RestTemplate();
 
 		for (Listing listing : listingsWithoutCoordinates) {
@@ -47,10 +47,12 @@ public class LocationServiceImpl implements LocationService {
 					double latitude = locationData.getDouble("lat");
 					double longitude = locationData.getDouble("lng");
 
-					listing.setLatitude(latitude);
-					listing.setLongitude(longitude);
-					listingRepository.save(listing);
+					UpdateListingDTO updateListingDTO = new UpdateListingDTO();
+					updateListingDTO.setLatitude(latitude);
+					updateListingDTO.setLongitude(longitude);
+					updateListingDTO.setListingId(listing.getListingId());
 
+					listingRepository.updateListing(updateListingDTO);
 				} else {
 					System.out.println("Failed to get coordinates for address: " + listing.getLocation());
 				}
@@ -82,10 +84,7 @@ public class LocationServiceImpl implements LocationService {
 
 					double latitude = locationData.getDouble("lat");
 					double longitude = locationData.getDouble("lng");
-
-					user.setLatitude(latitude);
-					user.setLongitude(longitude);
-					userRepository.save(user);
+					userRepository.updateUserLatitudeLongitude(latitude, longitude, user.getUserId());
 
 				} else {
 					System.out.println("Failed to get coordinates for address: " + user.getLocation());

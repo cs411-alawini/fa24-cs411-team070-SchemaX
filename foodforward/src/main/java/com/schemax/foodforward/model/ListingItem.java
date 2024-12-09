@@ -1,37 +1,79 @@
 package com.schemax.foodforward.model;
 
-import jakarta.persistence.*;
-import lombok.Data;
-
 import java.util.Date;
 
-@Entity
-@Data
+import lombok.ToString;
+
+@ToString
 public class ListingItem {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "listing_item_id")
-    private Long listingItemId;
+	private Long listingItemId;
 
-    @Column(name = "quantity")
-    private Long quantity;
+	private Long quantity;
 
-    @ManyToOne
-    @JoinColumn(name = "item_id")
-    private Item item;
+	private Item item;
 
-    @ManyToOne
-    @JoinColumn(name = "listing_id")
-    private Listing listing;
+	private Long listingId;
 
-    @ManyToOne
-    @JoinColumn(name = "booking_id")
-    private Booking booking;
+	private Long bookingId;
 
-    @Column(name = "expiration_date")
-    private Date expirationDate;
+	private Date expirationDate;
 
-    @Column(name = "status")
-    private String status;
+	private String status;
+
+	public Long getListingItemId() {
+		return listingItemId;
+	}
+
+	public void setListingItemId(Long listingItemId) {
+		this.listingItemId = listingItemId;
+	}
+
+	public Long getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(Long quantity) {
+		this.quantity = quantity;
+	}
+
+	public Item getItem() {
+		return item;
+	}
+
+	public void setItem(Item item) {
+		this.item = item;
+	}
+
+	public Long getListingId() {
+		return listingId;
+	}
+
+	public void setListingId(Long listingId) {
+		this.listingId = listingId;
+	}
+
+	public Long getBookingId() {
+		return bookingId;
+	}
+
+	public void setBookingId(Long bookingId) {
+		this.bookingId = bookingId;
+	}
+
+	public Date getExpirationDate() {
+		return expirationDate;
+	}
+
+	public void setExpirationDate(Date expirationDate) {
+		this.expirationDate = expirationDate;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
 
 }

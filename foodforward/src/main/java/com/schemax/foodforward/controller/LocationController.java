@@ -11,18 +11,18 @@ import com.schemax.foodforward.service.LocationService;
 @RequestMapping("/locations")
 public class LocationController {
 
-    @Autowired
-    private LocationService locationService;
+	@Autowired
+	private LocationService locationService;
 
-    @PostMapping("/update-listing-coordinates")
-    public String updateListingCoordinates() {
-        locationService.updateListingsWithCoordinates();
-        return "Locations updated successfully!";
-    }
-    
-    @PostMapping("/update-user-coordinates")
-    public String updateUserCoordinates() {
-        locationService.updateUsersWithCoordinates();
-        return "Users updated successfully!";
-    }
+	@PostMapping("/update-listing-coordinates")
+	public String updateListingCoordinates() {
+		locationService.updateListingsWithCoordinates();
+		return "Locations updated successfully!";
+	}
+
+	@PostMapping("/update-user-coordinates")
+	public String updateUserCoordinates() {
+		locationService.updateUsersWithCoordinates();
+		return "Users updated successfully!";
+	}
 }

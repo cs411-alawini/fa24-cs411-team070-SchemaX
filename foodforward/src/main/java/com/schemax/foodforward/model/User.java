@@ -1,43 +1,54 @@
 package com.schemax.foodforward.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import lombok.Data;
 
-@Entity
 @Data
 public class User {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "user_id")
+
 	private Long userId;
-
-	@Column(name = "name")
 	private String name;
-
-	@Column(name = "location")
 	private String location;
-
-	@Column(name = "latitude")
 	private Double latitude;
-
-	@Column(name = "longitude")
 	private Double longitude;
-
-	@Column(name = "contact_preference")
 	private String contactPreference;
-
-	@Column(name = "email")
 	private String email;
-
-	@Column(name = "phone")
 	private String phone;
-
-	@Column(name = "type")
 	private String type;
+	private String password;
+	private Long donorId;   
+    private Long recipientId;
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+	
+	public Long getDonorId() {
+		return donorId;
+	}
+
+	public void setDonorId(Long donorId) {
+		this.donorId = donorId;
+	}
+	
+	public Long getRecipientId() {
+		return recipientId;
+	}
+
+	public void setRecipientId(Long recipientId) {
+		this.recipientId = recipientId;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 
 	public String getLocation() {
 		return location;
@@ -63,4 +74,62 @@ public class User {
 		this.longitude = longitude;
 	}
 
+	public String getContactPreference() {
+		return contactPreference;
+	}
+
+	public void setContactPreference(String contactPreference) {
+		this.contactPreference = contactPreference;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+	
+	public String getPassword() {
+		return password;
+	}
+	
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public User(Long userId, String name, String location, Double latitude, Double longitude, String contactPreference,
+			String email, String phone, String type) {
+		super();
+		this.userId = userId;
+		this.name = name;
+		this.location = location;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.contactPreference = contactPreference;
+		this.email = email;
+		this.phone = phone;
+		this.type = type;
+	}
+
+	public User() {
+	}
+
+	
 }
