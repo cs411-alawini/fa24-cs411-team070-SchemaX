@@ -369,7 +369,7 @@ public class ListingRepository {
 				+ "i.item_id, i.item_name, i.category " + "FROM Listing l "
 				+ "LEFT JOIN Donor d ON l.listed_by = d.donor_id " + "LEFT JOIN User u ON l.listed_by = u.user_id "
 				+ "LEFT JOIN ListingItem li ON l.listing_id = li.listing_id "
-				+ "LEFT JOIN Item i ON li.item_id = i.item_id " + "WHERE l.listed_by = ?";
+				+ "LEFT JOIN Item i ON li.item_id = i.item_id " + "WHERE l.listed_by = ? ORDER BY listing_id desc";
 
 		log.info("Finding All Listings Query for donor id {} : {}", donorId, sql);
 		Map<Long, Listing> listingMap = new HashMap<>();
