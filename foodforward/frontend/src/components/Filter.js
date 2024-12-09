@@ -15,11 +15,12 @@ const FilterComponent = ({ onApplyFilters, location }) => {
   useEffect(() => {
 
     const recipientId = localStorage.getItem('recipientId') || '';
+    setFilters((prevState) => ({
       ...prevState,
-      recipientId, 
-      location: location || '', 
+      recipientId,
+      location: location || '',
     }));
-  }, [location]);
+  }, [location]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
