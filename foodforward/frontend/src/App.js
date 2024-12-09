@@ -24,15 +24,11 @@ function App() {
         <Route path="/listings" element={<ViewListings />} />
         <Route path="/listing/:id" element={<ListingDetails />} />
         <Route path="/confirmation" element={<BookingConfirmation />} />
-
-
-        {/* Donor views */}
         <Route path="/users/:donorId/donor_dashboard" element={<DonorDashboard />} />
         <Route path="/users/:donorId/create_listing" element={<CreateListing />} />
         <Route path="/create_item" element={<CreateItem />} />
         <Route path="/users/:donorId/listing_details/:id" element={<ViewListingDetails />} />
         <Route path="/users/:donorId/booking_details/:id" element={<BookingDetails />} />
-
       </Routes>
     </Router>
   );
